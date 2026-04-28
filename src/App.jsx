@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import './App.css'
 import { captureCards, guideMessages, modeContent, rankingData } from './data/gameContent'
 import { EntryPage } from './pages/EntryPage'
 import { GamePage } from './pages/GamePage'
@@ -9,6 +8,7 @@ import { NamePage } from './pages/NamePage'
 import { RankingPage } from './pages/RankingPage'
 import { ResultPage } from './pages/ResultPage'
 import { SharePage } from './pages/SharePage'
+import { AppShell, GlobalStyle, PageFrame } from './styles/ui'
 
 function App() {
   const [nickname, setNickname] = useState('')
@@ -59,8 +59,10 @@ function App() {
   }
 
   return (
-    <main className="app-shell">
-      <section className="page-frame">
+    <>
+      <GlobalStyle />
+      <AppShell>
+        <PageFrame>
         {page === 'home' && (
           <EntryPage onRanking={openRankingPage} onStart={openNamePage} />
         )}
@@ -98,8 +100,9 @@ function App() {
         )}
 
         {page === 'share' && <SharePage captureCards={captureCards} onRestart={goHome} />}
-      </section>
-    </main>
+        </PageFrame>
+      </AppShell>
+    </>
   )
 }
 

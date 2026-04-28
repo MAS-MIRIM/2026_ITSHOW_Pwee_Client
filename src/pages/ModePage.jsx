@@ -1,18 +1,20 @@
+import { CenteredSection, ModeButton, ModeGrid, ModeName } from '../styles/ui'
+
 export function ModePage({ mode, modeContent, onSelect }) {
   return (
-    <section className="single-panel">
-      <section className="mode-grid centered-mode-grid">
+    <CenteredSection>
+      <ModeGrid>
         {Object.entries(modeContent).map(([key, item]) => (
-          <button
+          <ModeButton
             key={key}
             type="button"
-            className={mode === key ? 'mode-card active mode-button-card' : 'mode-card mode-button-card'}
+            $active={mode === key}
             onClick={() => onSelect(key)}
           >
-            <strong className="mode-name">{item.label}</strong>
-          </button>
+            <ModeName>{item.label}</ModeName>
+          </ModeButton>
         ))}
-      </section>
-    </section>
+      </ModeGrid>
+    </CenteredSection>
   )
 }

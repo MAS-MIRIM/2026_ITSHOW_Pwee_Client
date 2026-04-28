@@ -1,30 +1,41 @@
+import {
+  ActionsRow,
+  CaptureCard,
+  CaptureGrid,
+  FillPanel,
+  GridSection,
+  PrimaryButton,
+  QRBox,
+  SecondaryButton,
+} from '../styles/ui'
+
 export function SharePage({ captureCards, onRestart }) {
   return (
-    <section className="page-grid">
-      <article className="panel share-panel">
-        <div className="capture-grid">
+    <GridSection>
+      <FillPanel $borderless>
+        <CaptureGrid>
           {captureCards.map((item) => (
-            <div key={item} className="capture-card">
+            <CaptureCard key={item}>
               {item}
-            </div>
+            </CaptureCard>
           ))}
-        </div>
-      </article>
+        </CaptureGrid>
+      </FillPanel>
 
-      <article className="panel share-action-panel">
-        <div className="qr-box">QR</div>
-        <div className="share-actions">
-          <button type="button" className="primary-button">
+      <FillPanel $borderless>
+        <QRBox>QR</QRBox>
+        <ActionsRow>
+          <PrimaryButton type="button">
             QR 다운로드
-          </button>
-          <button type="button" className="ghost-button">
+          </PrimaryButton>
+          <SecondaryButton type="button">
             인스타 공유
-          </button>
-        </div>
-        <button type="button" className="primary-button action-button" onClick={onRestart}>
+          </SecondaryButton>
+        </ActionsRow>
+        <PrimaryButton type="button" onClick={onRestart}>
           처음으로 돌아가기
-        </button>
-      </article>
-    </section>
+        </PrimaryButton>
+      </FillPanel>
+    </GridSection>
   )
 }

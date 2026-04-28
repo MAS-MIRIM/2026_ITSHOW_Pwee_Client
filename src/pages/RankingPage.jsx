@@ -1,20 +1,28 @@
+import {
+  CenteredSection,
+  Panel,
+  RankingItem,
+  RankingList,
+  SecondaryButton,
+} from '../styles/ui'
+
 export function RankingPage({ onBack, rankingData }) {
   return (
-    <section className="single-panel">
-      <article className="panel ranking-panel">
-        <div className="ranking-list">
+    <CenteredSection>
+      <Panel $width="520px" $borderless>
+        <RankingList>
           {rankingData.map((entry) => (
-            <div key={entry.name} className="ranking-item">
+            <RankingItem key={entry.name}>
               <span>{entry.rank}</span>
               <strong>{entry.name}</strong>
               <span>{entry.score}</span>
-            </div>
+            </RankingItem>
           ))}
-        </div>
-        <button type="button" className="ghost-button action-button" onClick={onBack}>
+        </RankingList>
+        <SecondaryButton type="button" onClick={onBack}>
           돌아가기
-        </button>
-      </article>
-    </section>
+        </SecondaryButton>
+      </Panel>
+    </CenteredSection>
   )
 }

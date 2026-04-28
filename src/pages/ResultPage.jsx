@@ -1,30 +1,42 @@
+import {
+  ActionsRow,
+  CenteredSection,
+  MetricBox,
+  MetricLabel,
+  MetricValue,
+  Panel,
+  PrimaryButton,
+  ResultPanel,
+  SecondaryButton,
+} from '../styles/ui'
+
 export function ResultPage({ currentMode, mode, nickname, onHome, onRanking }) {
   return (
-    <section className="single-panel">
-      <article className="panel result-panel-card centered-result-panel">
-        <div className="result-panel">
-          <div>
-            <p className="metric-label">{currentMode.resultPrimary}</p>
-            <strong className="metric-value">{currentMode.resultPrimaryValue}</strong>
-          </div>
-          <div>
-            <p className="metric-label">{currentMode.resultSecondary}</p>
-            <strong className="metric-value accent">
+    <CenteredSection>
+      <Panel $width="520px" $borderless>
+        <ResultPanel>
+          <MetricBox>
+            <MetricLabel>{currentMode.resultPrimary}</MetricLabel>
+            <MetricValue>{currentMode.resultPrimaryValue}</MetricValue>
+          </MetricBox>
+          <MetricBox>
+            <MetricLabel>{currentMode.resultSecondary}</MetricLabel>
+            <MetricValue>
               {mode === 'multi'
                 ? `${nickname || 'Player 1'} ${currentMode.resultSecondaryValue}`
                 : currentMode.resultSecondaryValue}
-            </strong>
-          </div>
-        </div>
-        <div className="scene-actions">
-          <button type="button" className="ghost-button" onClick={onHome}>
+            </MetricValue>
+          </MetricBox>
+        </ResultPanel>
+        <ActionsRow>
+          <SecondaryButton type="button" onClick={onHome}>
             홈으로 가기
-          </button>
-          <button type="button" className="primary-button action-button" onClick={onRanking}>
+          </SecondaryButton>
+          <PrimaryButton type="button" onClick={onRanking}>
             랭킹으로 가기
-          </button>
-        </div>
-      </article>
-    </section>
+          </PrimaryButton>
+        </ActionsRow>
+      </Panel>
+    </CenteredSection>
   )
 }

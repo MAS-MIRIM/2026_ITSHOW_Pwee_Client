@@ -1,14 +1,22 @@
+import {
+  CenteredColumn,
+  CenteredSection,
+  Panel,
+  PrimaryButton,
+  SecondaryButton,
+} from '../styles/ui'
+
 export function EntryPage({ onRanking, onStart }) {
   return (
-    <section className="single-panel">
-      <article className="panel home-panel">
-        <button type="button" className="primary-button action-button" onClick={onStart}>
+    <CenteredSection>
+      <Panel as={CenteredColumn} $width="420px" $gap="12px" $borderless>
+        <PrimaryButton type="button" onClick={onStart}>
           시작하기
-        </button>
-        <button type="button" className="ghost-button action-button" onClick={onRanking}>
+        </PrimaryButton>
+        <SecondaryButton type="button" onClick={onRanking}>
           랭킹화면 가기
-        </button>
-      </article>
-    </section>
+        </SecondaryButton>
+      </Panel>
+    </CenteredSection>
   )
 }

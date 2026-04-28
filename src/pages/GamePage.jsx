@@ -1,11 +1,13 @@
+import { CenteredSection, PlaceholderPanel, PrimaryButton } from '../styles/ui'
+
 export function GamePage({ onFinish }) {
   return (
-    <section className="single-panel">
-      <article className="panel empty-play-panel">
-        <button type="button" className="primary-button action-button" onClick={onFinish}>
+    <CenteredSection>
+      <PlaceholderPanel $width="520px" $borderless>
+        <PrimaryButton type="button" onClick={onFinish}>
           끝내기
-        </button>
-      </article>
-    </section>
+        </PrimaryButton>
+      </PlaceholderPanel>
+    </CenteredSection>
   )
 }

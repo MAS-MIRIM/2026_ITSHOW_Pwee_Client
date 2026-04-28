@@ -1,12 +1,20 @@
+import {
+  CenteredColumn,
+  CenteredSection,
+  GuideMessage,
+  Panel,
+  PrimaryButton,
+} from '../styles/ui'
+
 export function GuidePage({ message, onNext, step }) {
   return (
-    <section className="single-panel">
-      <article className="panel guide-panel">
-        <strong className="guide-message">{message}</strong>
-        <button type="button" className="primary-button action-button" onClick={onNext}>
+    <CenteredSection>
+      <Panel as={CenteredColumn} $width="520px" $gap="20px" $borderless>
+        <GuideMessage>{message}</GuideMessage>
+        <PrimaryButton type="button" onClick={onNext}>
           {step === 2 ? '다음' : '확인'}
-        </button>
-      </article>
-    </section>
+        </PrimaryButton>
+      </Panel>
+    </CenteredSection>
   )
 }
