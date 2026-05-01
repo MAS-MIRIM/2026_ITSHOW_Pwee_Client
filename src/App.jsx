@@ -17,6 +17,10 @@ function App() {
   const [guideStep, setGuideStep] = useState(0)
 
   const currentMode = useMemo(() => modeContent[mode] ?? modeContent.solo, [mode])
+  const currentGuideMessages = useMemo(
+    () => guideMessages[mode] ?? guideMessages.solo,
+    [mode],
+  )
 
   const openNamePage = () => {
     setPage('name')
@@ -40,7 +44,7 @@ function App() {
   }
 
   const advanceGuide = () => {
-    if (guideStep < guideMessages.length - 1) {
+    if (guideStep < currentGuideMessages.length - 1) {
       setGuideStep((prev) => prev + 1)
       return
     }
@@ -81,9 +85,8 @@ function App() {
 
         {page === 'guide' && (
           <GuidePage
-            message={guideMessages[guideStep]}
+            message={currentGuideMessages[guideStep]}
             onNext={advanceGuide}
-            step={guideStep}
           />
         )}
 

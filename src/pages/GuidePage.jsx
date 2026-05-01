@@ -1,19 +1,41 @@
+import { useEffect, useState } from 'react'
 import {
   CenteredColumn,
   CenteredSection,
   GuideMessage,
+  GuideMessageFrame,
   Panel,
-  PrimaryButton,
 } from '../styles/ui'
 
-export function GuidePage({ message, onNext, step }) {
+const GUIDE_DURATION_MS = 3000
+const GUIDE_FADE_DURATION_MS = 600
+
+export function GuidePage({ message, onNext }) {
+  const [isFading, setIsFading] = useState(false)
+
+  useEffect(() => {
+    setIsFading(false)
+
+    const fadeTimer = window.setTimeout(() => {
+      setIsFading(true)
+    }, GUIDE_DURATION_MS - GUIDE_FADE_DURATION_MS)
+
+    const nextTimer = window.setTimeout(() => {
+      onNext()
+    }, GUIDE_DURATION_MS)
+
+    return () => {
+      window.clearTimeout(fadeTimer)
+      window.clearTimeout(nextTimer)
+    }
+  }, [message, onNext])
+
   return (
     <CenteredSection>
       <Panel as={CenteredColumn} $width="520px" $gap="20px" $borderless>
-        <GuideMessage>{message}</GuideMessage>
-        <PrimaryButton type="button" onClick={onNext}>
-          {step === 2 ? '다음' : '확인'}
-        </PrimaryButton>
+        <GuideMessageFrame $fading={isFading}>
+          <GuideMessage>{message}</GuideMessage>
+        </GuideMessageFrame>
       </Panel>
     </CenteredSection>
   )
