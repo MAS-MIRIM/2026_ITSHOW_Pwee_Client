@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import styled, { createGlobalStyle } from 'styled-components'
 import { captureCards, guideMessages, modeContent, rankingData } from './data/gameContent'
 import { EntryPage } from './pages/EntryPage'
 import { GamePage } from './pages/GamePage'
@@ -8,7 +9,66 @@ import { NamePage } from './pages/NamePage'
 import { RankingPage } from './pages/RankingPage'
 import { ResultPage } from './pages/ResultPage'
 import { SharePage } from './pages/SharePage'
-import { AppShell, GlobalStyle, PageFrame } from './styles/ui'
+
+const GlobalStyle = createGlobalStyle`
+  :root {
+    font-family:
+      'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', 'Segoe UI', sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
+    color: #856b6b;
+    background: #fffdf2;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html,
+  body,
+  #root {
+    min-height: 100%;
+  }
+
+  body {
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+    background: #fffdf2;
+  }
+
+  button,
+  input {
+    font: inherit;
+  }
+
+  button {
+    appearance: none;
+  }
+
+  h1,
+  h2,
+  h3,
+  p {
+    margin: 0;
+  }
+`
+
+const AppShell = styled.main`
+  width: min(100%, 960px);
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+`
+
+const PageFrame = styled.section`
+  min-height: calc(100vh - 64px);
+  display: grid;
+  place-items: center;
+`
 
 function App() {
   const [nickname, setNickname] = useState('')
