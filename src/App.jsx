@@ -11,6 +11,8 @@ import { ResultPage } from './pages/ResultPage'
 import { SharePage } from './pages/SharePage'
 
 const GlobalStyle = createGlobalStyle`
+  @import url('https://fonts.googleapis.com/css2?family=Gruppo&family=Suez+One&display=swap');
+
   :root {
     font-family:
       'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', 'Segoe UI', sans-serif;
@@ -61,7 +63,7 @@ const GlobalStyle = createGlobalStyle`
 const AppShell = styled.main`
   width: min(100%, 960px);
   margin: 0 auto;
-  padding: 24px 16px 40px;
+  padding: 0;
 `
 
 const PageFrame = styled.section`
