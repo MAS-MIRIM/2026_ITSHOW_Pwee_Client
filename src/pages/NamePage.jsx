@@ -1,71 +1,82 @@
-import styled from 'styled-components'
+import styled from "styled-components";
 
 const Section = styled.section`
-  min-height: inherit;
+  width: 100vw;
+  min-height: 100vh;
+  padding: 36px;
   display: grid;
-  place-items: center;
-`
+  background: #fffdf2;
+  margin-left: calc(18% - 25vw);
+`;
 
-const Panel = styled.article`
-  width: min(100%, 420px);
+const Frame = styled.form`
+  width: 100%;
+  min-height: calc(100vh - 72px);
+  border: 4px solid #856b6b;
+  border-radius: 8px;
+  padding: 48px 40px;
   display: grid;
-  gap: 16px;
-`
+  justify-items: center;
+  align-content: center;
+  gap: 28px;
+`;
+
+const Copy = styled.div`
+  display: grid;
+  gap: 6px;
+  justify-items: center;
+  text-align: center;
+`;
+
+const Title = styled.p`
+  color: #856b6b;
+  font-size: clamp(1.2rem, 2.6vw, 1.8rem);
+  font-weight: 500;
+`;
+
+const Subtitle = styled.p`
+  color: #856b6b;
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  line-height: 1.4;
+`;
 
 const TextInput = styled.input`
-  width: 100%;
-  padding: 14px 16px;
-  border: none;
-  border-radius: 12px;
-  background: #fffdf2;
-  color: #856b6b;
-  box-shadow: inset 0 0 0 1px rgba(133, 107, 107, 0.12);
-
-  &:focus-visible {
-    outline: 2px solid rgba(133, 107, 107, 0.45);
-    outline-offset: 2px;
-  }
-`
-
-const Button = styled.button`
-  border-radius: 12px;
-  padding: 14px 16px;
+  margin-top: 48px;
+  width: min(100%, 520px);
+  padding: 18px 20px;
   border: 2px solid #856b6b;
-  background: #856b6b;
-  color: #fffdf2;
-  cursor: pointer;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #856b6b;
+  font-size: 1.1rem;
 
-  &:disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
+  &::placeholder {
+    color: #856b6b;
+    opacity: 0.62;
   }
-
-  &:focus-visible {
-    outline: 2px solid rgba(133, 107, 107, 0.45);
-    outline-offset: 2px;
-  }
-`
+`;
 
 export function NamePage({ nickname, onNext, setNickname }) {
-  const canStart = nickname.trim().length > 0
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    onNext();
+  };
 
   return (
     <Section>
-      <Panel>
+      <Frame onSubmit={handleSubmit}>
+        <Copy>
+          <Title>게임 내에서 사용할 닉네임을 입력해주세요</Title>
+          <Subtitle>Type your name please.</Subtitle>
+        </Copy>
         <TextInput
           id="nickname"
           value={nickname}
           onChange={(event) => setNickname(event.target.value)}
           placeholder="닉네임 입력"
+          autoFocus
         />
-        <Button
-          type="button"
-          disabled={!canStart}
-          onClick={onNext}
-        >
-          확인
-        </Button>
-      </Panel>
+      </Frame>
     </Section>
-  )
+  );
 }
