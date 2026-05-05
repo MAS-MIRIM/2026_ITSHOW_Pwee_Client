@@ -1,55 +1,103 @@
-import styled from 'styled-components'
+import styled from "styled-components";
 
 const Section = styled.section`
-  min-height: inherit;
+  width: 100vw;
+  min-height: 100vh;
+  padding: 36px;
   display: grid;
-  place-items: center;
-`
+  background: #fffdf2;
+  margin-left: calc(18% - 25vw);
+`;
+
+const Frame = styled.section`
+  width: 100%;
+  min-height: calc(100vh - 72px);
+  border: 4px solid #856b6b;
+  border-radius: 8px;
+  padding: 48px 40px;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 28px;
+`;
+
+const Copy = styled.div`
+  display: grid;
+  gap: 6px;
+  justify-items: center;
+  text-align: center;
+`;
+
+const Title = styled.p`
+  color: #856b6b;
+  font-size: clamp(1.2rem, 2.6vw, 1.8rem);
+  font-weight: 500;
+`;
+
+const Subtitle = styled.p`
+  color: #856b6b;
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  line-height: 1.4;
+`;
 
 const ModeGrid = styled.section`
-  width: min(100%, 640px);
+  margin-top: 48px;
+  width: min(100%, 760px);
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
 
-  @media (max-width: 560px) {
+  @media (max-width: 640px) {
     grid-template-columns: 1fr;
   }
-`
+`;
 
 const ModeButton = styled.button`
-  min-height: 160px;
-  padding: 24px 20px;
-  border: 1px solid
-    ${({ $active }) => ($active ? '#856b6b' : 'rgba(133, 107, 107, 0.22)')};
-  border-radius: 16px;
-  background: ${({ $active }) =>
-    $active ? 'rgba(133, 107, 107, 0.08)' : '#fffdf2'};
+  min-height: 140px;
+  padding: 18px 20px;
+  border: 2px solid #856b6b;
+  border-radius: 6px;
+  background: ${({ $active }) => ($active ? "#856b6b" : "#ffffff")};
   color: #856b6b;
-  text-align: left;
+  text-align: center;
   cursor: pointer;
-`
+  display: grid;
+  place-items: center;
+
+  ${({ $active }) =>
+    $active &&
+    `
+      color: #fffdf2;
+    `}
+`;
 
 const ModeName = styled.strong`
-  font-size: 1.25rem;
-  font-weight: 700;
-`
+  font-size: 1.1rem;
+  font-weight: 500;
+`;
 
 export function ModePage({ mode, modeContent, onSelect }) {
   return (
     <Section>
-      <ModeGrid>
-        {Object.entries(modeContent).map(([key, item]) => (
-          <ModeButton
-            key={key}
-            type="button"
-            $active={mode === key}
-            onClick={() => onSelect(key)}
-          >
-            <ModeName>{item.label}</ModeName>
-          </ModeButton>
-        ))}
-      </ModeGrid>
+      <Frame>
+        <Copy>
+          <Title>플레이 방식을 선택해주세요</Title>
+          <Subtitle>Choose your play mode.</Subtitle>
+        </Copy>
+
+        <ModeGrid>
+          {Object.entries(modeContent).map(([key, item]) => (
+            <ModeButton
+              key={key}
+              type="button"
+              $active={mode === key}
+              onClick={() => onSelect(key)}
+            >
+              <ModeName>{item.label}</ModeName>
+            </ModeButton>
+          ))}
+        </ModeGrid>
+      </Frame>
     </Section>
-  )
+  );
 }
