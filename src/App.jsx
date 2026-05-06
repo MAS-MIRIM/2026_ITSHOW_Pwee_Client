@@ -148,6 +148,7 @@ function App() {
         {page === 'guide' && (
           <GuidePage
             message={currentGuideMessages[guideStep]}
+            step={guideStep}
             onNext={advanceGuide}
           />
         )}
