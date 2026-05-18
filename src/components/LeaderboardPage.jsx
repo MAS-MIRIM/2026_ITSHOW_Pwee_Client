@@ -6,30 +6,38 @@ const Page = styled.div`
   inset: 0;
   background: #FFFDF2;
   display: flex;
-  align-items: flex-end;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
   padding: clamp(36px, 4vw, 64px) clamp(24px, 4vw, 64px) 0;
   box-sizing: border-box;
   overflow: hidden;
 `
 
-const RANKINGS = [
-  { rank: 1,  name: '우지영', time: '00:10' },
-  { rank: 2,  name: '김민수', time: '00:12' },
-  { rank: 3,  name: '이서연', time: '00:15' },
-  { rank: 4,  name: '박지호', time: '00:17' },
-  { rank: 5,  name: '최예나', time: '00:20' },
-  { rank: 6,  name: '정도윤', time: '00:22' },
-  { rank: 7,  name: '조수아', time: '00:25' },
-  { rank: 8,  name: '한지우', time: '00:28' },
-  { rank: 9,  name: '서태민', time: '00:31' },
-  { rank: 10, name: '윤하은', time: '00:34' },
-]
+const BackButton = styled.button`
+  position: absolute;
+  top: clamp(16px, 2.5vw, 28px);
+  right: clamp(16px, 2.5vw, 28px);
+  font-family: 'Suez One', Georgia, serif;
+  font-size: clamp(13px, 1.4vw, 16px);
+  color: #463C3C;
+  background: #F8E9C8;
+  border: 2px solid #856B6B;
+  border-radius: 999px;
+  padding: 8px 20px;
+  cursor: pointer;
+  z-index: 10;
 
-export default function LeaderboardPage() {
+  &:hover { background: #FFE9A8; }
+`
+
+export default function LeaderboardPage({ rankings = [], onBack }) {
   return (
     <Page>
-      <LeaderboardPanel rankings={RANKINGS} />
+      {onBack && (
+        <BackButton type="button" onClick={onBack}>← 돌아가기</BackButton>
+      )}
+      <LeaderboardPanel rankings={rankings} />
     </Page>
   )
 }

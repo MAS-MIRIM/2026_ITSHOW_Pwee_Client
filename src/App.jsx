@@ -1,12 +1,15 @@
 import { useMemo, useState } from 'react'
 import styled, { createGlobalStyle } from 'styled-components'
-import { captureCards, guideMessages, modeContent, rankingData } from './data/gameContent'
+import { guideMessages, modeContent, rankingData } from './data/gameContent'
+import GameLayout from './components/GameLayout'
+import SoloGameLayout from './components/SoloGameLayout'
+import FourCutPage from './components/FourCutPage'
+import FilterPage from './components/FilterPage'
+import LeaderboardPage from './components/LeaderboardPage'
 import { EntryPage } from './pages/EntryPage'
-import { GamePage } from './pages/GamePage'
 import { GuidePage } from './pages/GuidePage'
 import { ModePage } from './pages/ModePage'
 import { NamePage } from './pages/NamePage'
-import { RankingPage } from './pages/RankingPage'
 import { ResultPage } from './pages/ResultPage'
 import { SharePage } from './pages/SharePage'
 
@@ -78,7 +81,6 @@ function App() {
   const [page, setPage] = useState('home')
   const [guideStep, setGuideStep] = useState(0)
 
-  const currentMode = useMemo(() => modeContent[mode] ?? modeContent.solo, [mode])
   const currentGuideMessages = useMemo(
     () => guideMessages[mode] ?? guideMessages.solo,
     [mode],
@@ -117,6 +119,18 @@ function App() {
     setPage('result')
   }
 
+  const goToFourCut = () => {
+    setPage('fourcut')
+  }
+
+  const goToFilter = () => {
+    setPage('filter')
+  }
+
+  const goToShare = () => {
+    setPage('share')
+  }
+
   const goHome = () => {
     setNickname('')
     setMode('')
@@ -134,7 +148,7 @@ function App() {
         )}
 
         {page === 'ranking' && (
-          <RankingPage onBack={goHome} rankingData={rankingData} />
+          <LeaderboardPage rankings={rankingData} onBack={goHome} />
         )}
 
         {page === 'name' && (
@@ -153,19 +167,29 @@ function App() {
           />
         )}
 
-        {page === 'game' && <GamePage onFinish={finishGame} />}
+        {page === 'game' && mode === 'multi' && (
+          <GameLayout onFinish={finishGame} />
+        )}
+
+        {page === 'game' && mode !== 'multi' && (
+          <SoloGameLayout onFinish={finishGame} />
+        )}
 
         {page === 'result' && (
           <ResultPage
-            currentMode={currentMode}
             mode={mode || 'solo'}
             nickname={nickname}
             onHome={goHome}
             onRanking={openRankingPage}
+            onFourCut={goToFourCut}
           />
         )}
 
-        {page === 'share' && <SharePage captureCards={captureCards} onRestart={goHome} />}
+        {page === 'fourcut' && <FourCutPage onFilter={goToFilter} />}
+
+        {page === 'filter' && <FilterPage onDone={goToShare} />}
+
+        {page === 'share' && <SharePage onRestart={goHome} />}
         </PageFrame>
       </AppShell>
     </>

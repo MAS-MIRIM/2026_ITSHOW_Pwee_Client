@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import WebcamSplitView from "./WebcamSplitView";
 import MemoCharacterCard from "./MemoCharacterCard";
@@ -54,12 +53,11 @@ const EndButton = styled.button`
   &:hover { background: #FFE9A8; }
 `;
 
-export default function GameLayout() {
+export default function GameLayout({ onFinish }) {
   const [scores] = useState({ left: 0, right: 0 });
   const leftRef = useRef(null);
   const rightRef = useRef(null);
   const startRef = useRef(null);
-  const navigate = useNavigate();
   const { pushCapture, setResult, pickFourCut } = useGameSession();
 
   useEffect(() => {
@@ -73,7 +71,7 @@ export default function GameLayout() {
     const timeMs = Date.now() - (startRef.current ?? Date.now());
     setResult({ mode: "multi", timeMs, score: { left: scores.left, right: scores.right } });
     pickFourCut();
-    navigate("/result");
+    onFinish();
   };
 
   return (

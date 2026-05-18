@@ -1,100 +1,84 @@
 import styled from 'styled-components'
+import { useGameSession } from '../context/gameSession'
 
-const Section = styled.section`
-  min-height: inherit;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-
-  @media (max-width: 720px) {
-    grid-template-columns: 1fr;
-  }
+const Page = styled.div`
+  position: fixed;
+  inset: 0;
+  background: #fffdf2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(24px, 4vw, 48px);
+  box-sizing: border-box;
 `
 
-const Panel = styled.article`
+const Stage = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(20px, 3vw, 32px);
+  width: min(400px, 100%);
+`
+
+const PhotoPreview = styled.div`
   width: 100%;
-  display: grid;
-  gap: 16px;
-`
+  aspect-ratio: 4 / 3;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #1f1a1a;
 
-const CaptureGrid = styled.div`
-  display: grid;
-  gap: 12px;
-`
-
-const CaptureCard = styled.div`
-  padding: 16px;
-  border-radius: 12px;
-  background: rgba(133, 107, 107, 0.04);
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 `
 
 const QRBox = styled.div`
-  min-height: 180px;
+  width: clamp(160px, 30vw, 220px);
+  aspect-ratio: 1;
+  border-radius: 16px;
+  background: #fff;
+  border: 2px solid #e5dfd3;
   display: grid;
   place-items: center;
-  border-radius: 12px;
-  background: rgba(133, 107, 107, 0.04);
-  font-weight: 600;
+  font-family: 'Suez One', Georgia, serif;
+  font-size: clamp(13px, 1.5vw, 16px);
+  color: #856b6b;
+  letter-spacing: 0.08em;
 `
 
-const ActionsRow = styled.div`
-  display: flex;
-  gap: 12px;
-
-  @media (max-width: 560px) {
-    flex-direction: column;
-  }
-`
-
-const Button = styled.button`
-  border-radius: 12px;
-  padding: 14px 16px;
+const BackButton = styled.button`
+  font-family: 'Suez One', Georgia, serif;
+  font-size: clamp(14px, 1.6vw, 18px);
+  color: #463c3c;
+  background: #f8e9c8;
   border: 2px solid #856b6b;
+  border-radius: 999px;
+  padding: 12px 32px;
   cursor: pointer;
 
-  &:focus-visible {
-    outline: 2px solid rgba(133, 107, 107, 0.45);
-    outline-offset: 2px;
+  &:hover {
+    background: #ffe9a8;
   }
 `
 
-const PrimaryButton = styled(Button)`
-  background: #856b6b;
-  color: #fffdf2;
-`
+export function SharePage({ onRestart }) {
+  const { filterShot } = useGameSession()
 
-const SecondaryButton = styled(Button)`
-  background: #fffdf2;
-  color: #856b6b;
-`
-
-export function SharePage({ captureCards, onRestart }) {
   return (
-    <Section>
-      <Panel>
-        <CaptureGrid>
-          {captureCards.map((item) => (
-            <CaptureCard key={item}>
-              {item}
-            </CaptureCard>
-          ))}
-        </CaptureGrid>
-      </Panel>
-
-      <Panel>
+    <Page>
+      <Stage>
+        {filterShot && (
+          <PhotoPreview>
+            <img src={filterShot} alt="필터 사진" />
+          </PhotoPreview>
+        )}
         <QRBox>QR</QRBox>
-        <ActionsRow>
-          <PrimaryButton type="button">
-            QR 다운로드
-          </PrimaryButton>
-          <SecondaryButton type="button">
-            인스타 공유
-          </SecondaryButton>
-        </ActionsRow>
-        <PrimaryButton type="button" onClick={onRestart}>
-          처음으로 돌아가기
-        </PrimaryButton>
-      </Panel>
-    </Section>
+        <BackButton type="button" onClick={onRestart}>
+          돌아가기
+        </BackButton>
+      </Stage>
+    </Page>
   )
 }

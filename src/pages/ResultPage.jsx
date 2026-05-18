@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { useGameSession } from '../context/gameSession'
 
 const Section = styled.section`
   min-height: inherit;
@@ -10,6 +11,13 @@ const Panel = styled.article`
   width: min(100%, 520px);
   display: grid;
   gap: 16px;
+`
+
+const Title = styled.h2`
+  font-family: 'Suez One', Georgia, serif;
+  font-size: clamp(22px, 3vw, 30px);
+  color: #463C3C;
+  text-align: center;
 `
 
 const ResultPanel = styled.div`
@@ -72,32 +80,60 @@ const PrimaryButton = styled(Button)`
   color: #fffdf2;
 `
 
-export function ResultPage({ currentMode, mode, nickname, onHome, onRanking }) {
+function formatTime(ms) {
+  if (!ms) return '00:00.00'
+  const totalSec = ms / 1000
+  const min = Math.floor(totalSec / 60).toString().padStart(2, '0')
+  const sec = (totalSec % 60).toFixed(2).padStart(5, '0')
+  return `${min}:${sec}`
+}
+
+export function ResultPage({ mode, nickname, onHome, onRanking, onFourCut }) {
+  const { result } = useGameSession()
+
+  const timeDisplay = formatTime(result?.timeMs)
+
+  const primaryLabel = mode === 'multi' ? '최종 점수' : '총 소요 시간'
+  const primaryValue =
+    mode === 'multi'
+      ? `${result?.score?.left ?? 0} : ${result?.score?.right ?? 0}`
+      : timeDisplay
+
+  const secondaryLabel = mode === 'multi' ? '승패 결과' : '소요 시간'
+  const secondaryValue =
+    mode === 'multi'
+      ? (result?.score?.left ?? 0) > (result?.score?.right ?? 0)
+        ? `${nickname || 'Player 1'} WIN`
+        : (result?.score?.left ?? 0) < (result?.score?.right ?? 0)
+          ? `${nickname || 'Player 1'} LOSE`
+          : 'DRAW'
+      : timeDisplay
+
   return (
     <Section>
       <Panel>
+        <Title>게임 결과</Title>
         <ResultPanel>
           <MetricBox>
-            <MetricLabel>{currentMode.resultPrimary}</MetricLabel>
-            <MetricValue>{currentMode.resultPrimaryValue}</MetricValue>
+            <MetricLabel>{primaryLabel}</MetricLabel>
+            <MetricValue>{primaryValue}</MetricValue>
           </MetricBox>
           <MetricBox>
-            <MetricLabel>{currentMode.resultSecondary}</MetricLabel>
-            <MetricValue>
-              {mode === 'multi'
-                ? `${nickname || 'Player 1'} ${currentMode.resultSecondaryValue}`
-                : currentMode.resultSecondaryValue}
-            </MetricValue>
+            <MetricLabel>{secondaryLabel}</MetricLabel>
+            <MetricValue>{secondaryValue}</MetricValue>
           </MetricBox>
         </ResultPanel>
         <ActionsRow>
           <SecondaryButton type="button" onClick={onHome}>
             홈으로 가기
           </SecondaryButton>
-          <PrimaryButton type="button" onClick={onRanking}>
+          <SecondaryButton type="button" onClick={onRanking}>
             랭킹으로 가기
-          </PrimaryButton>
+          </SecondaryButton>
         </ActionsRow>
+        <PrimaryButton type="button" onClick={onFourCut}>
+          인생네컷 보기 →
+        </PrimaryButton>
       </Panel>
     </Section>
   )

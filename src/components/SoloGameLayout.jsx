@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import WebcamSoloView from './WebcamSoloView'
 import MemoCharacterCard from './MemoCharacterCard'
@@ -47,10 +46,9 @@ const EndButton = styled.button`
   &:hover { background: #FFE9A8; }
 `
 
-export default function SoloGameLayout() {
+export default function SoloGameLayout({ onFinish }) {
   const videoRef = useRef(null)
   const startRef = useRef(null)
-  const navigate = useNavigate()
   const { pushCapture, setResult, pickFourCut } = useGameSession()
 
   useEffect(() => {
@@ -64,7 +62,7 @@ export default function SoloGameLayout() {
     const timeMs = Date.now() - (startRef.current ?? Date.now())
     setResult({ mode: 'solo', timeMs, score: 10 })
     pickFourCut()
-    navigate('/result')
+    onFinish()
   }
 
   return (

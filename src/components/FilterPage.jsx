@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import styled, { css, keyframes } from 'styled-components'
 import { useGameSession } from '../context/gameSession'
 import { getFaceLandmarker, LANDMARK } from '../utils/faceLandmarker'
@@ -282,8 +281,7 @@ function drawStickers(ctx, landmarks, filter, stickers, w, h) {
   }
 }
 
-function FilterPageInner({ onRetry }) {
-  const navigate = useNavigate()
+function FilterPageInner({ onRetry, onDone }) {
   const { setFilterShot } = useGameSession()
   const videoRef = useRef(null)
   const overlayRef = useRef(null)
@@ -470,8 +468,8 @@ function FilterPageInner({ onRetry }) {
 
     const dataUrl = out.toDataURL('image/png')
     setFilterShot(dataUrl)
-    navigate('/share')
-  }, [navigate, setFilterShot])
+    onDone()
+  }, [onDone, setFilterShot])
 
   // Countdown — only starts once camera is up so users aren't auto-shuttered into a blank shot.
   useEffect(() => {
@@ -564,8 +562,7 @@ function FilterPageInner({ onRetry }) {
   )
 }
 
-export default function FilterPage() {
-  // Bumping this key forces a fresh FilterPageInner mount (clean refs + new init).
+export default function FilterPage({ onDone }) {
   const [retryKey, setRetryKey] = useState(0)
-  return <FilterPageInner key={retryKey} onRetry={() => setRetryKey((k) => k + 1)} />
+  return <FilterPageInner key={retryKey} onRetry={() => setRetryKey((k) => k + 1)} onDone={onDone} />
 }

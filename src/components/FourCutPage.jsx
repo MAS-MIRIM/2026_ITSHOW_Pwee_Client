@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import { useGameSession } from '../context/gameSession'
 import { composeFourCut } from '../utils/composeFourCut'
@@ -121,8 +120,7 @@ const Btn = styled.button`
   &:disabled { opacity: 0.45; cursor: not-allowed; }
 `
 
-export default function FourCutPage() {
-  const navigate = useNavigate()
+export default function FourCutPage({ onFilter }) {
   const { fourCutShots } = useGameSession()
   const [composed, setComposed] = useState(null)
   const [loaded, setLoaded] = useState(false)
@@ -169,7 +167,7 @@ export default function FourCutPage() {
           >
             ⬇ 다운로드
           </Btn>
-          <Btn type="button" className="primary" onClick={() => navigate('/filter')}>
+          <Btn type="button" className="primary" onClick={onFilter}>
             필터로 사진 찍기 →
           </Btn>
         </Actions>
