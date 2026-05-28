@@ -1,13 +1,3 @@
-export const pageOrder = ["entry", "mode", "game", "result", "share"];
-
-export const pageMeta = {
-  entry: { step: "01", title: "진입" },
-  mode: { step: "02", title: "모드 선택" },
-  game: { step: "03", title: "게임 진행" },
-  result: { step: "04", title: "결과 확인" },
-  share: { step: "05", title: "촬영 · 공유" },
-};
-
 export const modeContent = {
   solo: {
     label: "솔로 모드",
@@ -45,12 +35,6 @@ export const modeContent = {
   },
 };
 
-export const captureCards = [
-  "일치율이 가장 낮은 순간 자동 캡처",
-  "망한샷과 베스트컷을 함께 저장",
-  "게임 종료 후 4컷 프레임 자동 생성",
-  "AR 필터 적용 사진까지 한 번에 제공",
-];
 
 export const guideMessages = {
   solo: [
