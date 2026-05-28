@@ -12,6 +12,7 @@ import { ModePage } from './pages/ModePage'
 import { NamePage } from './pages/NamePage'
 import { ResultPage } from './pages/ResultPage'
 import { SharePage } from './pages/SharePage'
+import { GameSessionProvider } from './context/GameSessionProvider'
 
 const GlobalStyle = createGlobalStyle`
   @import url('https://fonts.googleapis.com/css2?family=Gruppo&family=Suez+One&display=swap');
@@ -139,60 +140,60 @@ function App() {
   }
 
   return (
-    <>
+    <GameSessionProvider>
       <GlobalStyle />
       <AppShell>
         <PageFrame>
-        {page === 'home' && (
-          <EntryPage onRanking={openRankingPage} onStart={openNamePage} />
-        )}
+          {page === 'home' && (
+            <EntryPage onRanking={openRankingPage} onStart={openNamePage} />
+          )}
 
-        {page === 'ranking' && (
-          <LeaderboardPage rankings={rankingData} onBack={goHome} />
-        )}
+          {page === 'ranking' && (
+            <LeaderboardPage rankings={rankingData} onBack={goHome} />
+          )}
 
-        {page === 'name' && (
-          <NamePage nickname={nickname} onNext={submitName} setNickname={setNickname} />
-        )}
+          {page === 'name' && (
+            <NamePage nickname={nickname} onNext={submitName} setNickname={setNickname} />
+          )}
 
-        {page === 'mode' && (
-          <ModePage mode={mode} modeContent={modeContent} onSelect={selectMode} />
-        )}
+          {page === 'mode' && (
+            <ModePage mode={mode} modeContent={modeContent} onSelect={selectMode} />
+          )}
 
-        {page === 'guide' && (
-          <GuidePage
-            message={currentGuideMessages[guideStep]}
-            step={guideStep}
-            onNext={advanceGuide}
-          />
-        )}
+          {page === 'guide' && (
+            <GuidePage
+              message={currentGuideMessages[guideStep]}
+              step={guideStep}
+              onNext={advanceGuide}
+            />
+          )}
 
-        {page === 'game' && mode === 'multi' && (
-          <GameLayout onFinish={finishGame} />
-        )}
+          {page === 'game' && mode === 'multi' && (
+            <GameLayout onFinish={finishGame} />
+          )}
 
-        {page === 'game' && mode !== 'multi' && (
-          <SoloGameLayout onFinish={finishGame} />
-        )}
+          {page === 'game' && mode !== 'multi' && (
+            <SoloGameLayout onFinish={finishGame} nickname={nickname} />
+          )}
 
-        {page === 'result' && (
-          <ResultPage
-            mode={mode || 'solo'}
-            nickname={nickname}
-            onHome={goHome}
-            onRanking={openRankingPage}
-            onFourCut={goToFourCut}
-          />
-        )}
+          {page === 'result' && (
+            <ResultPage
+              mode={mode || 'solo'}
+              nickname={nickname}
+              onHome={goHome}
+              onRanking={openRankingPage}
+              onFourCut={goToFourCut}
+            />
+          )}
 
-        {page === 'fourcut' && <FourCutPage onFilter={goToFilter} />}
+          {page === 'fourcut' && <FourCutPage onFilter={goToFilter} />}
 
-        {page === 'filter' && <FilterPage onDone={goToShare} />}
+          {page === 'filter' && <FilterPage onDone={goToShare} />}
 
-        {page === 'share' && <SharePage onRestart={goHome} />}
+          {page === 'share' && <SharePage onRestart={goHome} />}
         </PageFrame>
       </AppShell>
-    </>
+    </GameSessionProvider>
   )
 }
 

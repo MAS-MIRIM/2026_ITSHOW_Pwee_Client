@@ -1,15 +1,22 @@
-import { useEffect, useRef } from 'react'
-import styled from 'styled-components'
+import { useEffect, useRef, useState } from 'react'
+import styled, { css, keyframes } from 'styled-components'
 import WebcamSoloView from './WebcamSoloView'
 import MemoCharacterCard from './MemoCharacterCard'
-import Timer from './Timer'
 import { useGameSession } from '../context/gameSession'
-import { useWebcamCapture } from '../hooks/useWebcamCapture'
+import { startSoloGame, sendFrame, finishSoloGame } from '../api/soloApi'
+
+const FRAME_INTERVAL_MS = 350
+const ROUND_TOTAL_SEC = 15
+
+const flash = keyframes`
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.6; }
+`
 
 const Page = styled.div`
   position: fixed;
   inset: 0;
-  background: #FFFDF2;
+  background: #fffdf2;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -23,8 +30,63 @@ const Stage = styled.div`
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: clamp(16px, 2vw, 26px);
-  padding-top: clamp(56px, 7vh, 80px);
+  gap: clamp(12px, 1.8vw, 20px);
+  padding-top: clamp(40px, 5vh, 64px);
+`
+
+const ProgressRow = styled.div`
+  display: flex;
+  justify-content: center;
+  font-family: 'Suez One', Georgia, serif;
+  font-size: clamp(13px, 1.5vw, 16px);
+  color: #856b6b;
+  letter-spacing: 0.08em;
+`
+
+const ExpressionCard = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 24px;
+  border: 2px solid #856b6b;
+  border-radius: 16px;
+  background: ${({ $feedback }) =>
+    $feedback === 'matched' ? '#d4edda' :
+    $feedback === 'timeout' ? '#fde0de' :
+    '#f8e9c8'};
+  transition: background 0.25s ease;
+  ${({ $feedback }) =>
+    $feedback &&
+    css`animation: ${flash} 0.5s ease;`}
+`
+
+const ExpressionEmoji = styled.span`
+  font-size: clamp(36px, 6vw, 56px);
+  line-height: 1;
+`
+
+const ExpressionLabel = styled.span`
+  font-family: 'Suez One', Georgia, serif;
+  font-size: clamp(16px, 2.2vw, 22px);
+  color: #463c3c;
+`
+
+const ScoreBarWrap = styled.div`
+  width: 100%;
+  max-width: 240px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(133, 107, 107, 0.18);
+  overflow: hidden;
+`
+
+const ScoreBarFill = styled.div`
+  height: 100%;
+  border-radius: 999px;
+  background: ${({ $score }) => ($score >= 0.8 ? '#2e7d32' : $score >= 0.5 ? '#856b6b' : '#856b6b')};
+  width: ${({ $score }) => Math.round($score * 100)}%;
+  transition: width 0.2s ease;
 `
 
 const CamFrame = styled.div`
@@ -32,48 +94,214 @@ const CamFrame = styled.div`
   width: 100%;
 `
 
-const EndButton = styled.button`
-  align-self: center;
-  font-family: 'Suez One', Georgia, serif;
-  font-size: clamp(14px, 1.6vw, 18px);
-  color: #463C3C;
-  background: #F8E9C8;
-  border: 2px solid #856B6B;
-  border-radius: 999px;
-  padding: 10px 22px;
-  cursor: pointer;
-
-  &:hover { background: #FFE9A8; }
+const RoundTimerRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
 `
 
-export default function SoloGameLayout({ onFinish }) {
-  const videoRef = useRef(null)
-  const startRef = useRef(null)
-  const { pushCapture, setResult, pickFourCut } = useGameSession()
+const TimerLabel = styled.span`
+  font-family: 'Suez One', Georgia, serif;
+  font-size: clamp(16px, 2vw, 22px);
+  color: ${({ $warn }) => ($warn ? '#c44545' : '#463c3c')};
+  font-variant-numeric: tabular-nums;
+  transition: color 0.2s;
+`
 
-  useEffect(() => {
-    startRef.current = Date.now()
-  }, [])
+const TimerBarWrap = styled.div`
+  width: clamp(120px, 20vw, 200px);
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(133, 107, 107, 0.18);
+  overflow: hidden;
+`
 
-  useWebcamCapture(videoRef, { enabled: true, intervalMs: 3000, onCapture: pushCapture })
+const TimerBarFill = styled.div`
+  height: 100%;
+  border-radius: 999px;
+  background: ${({ $warn }) => ($warn ? '#c44545' : '#463c3c')};
+  width: ${({ $pct }) => $pct}%;
+  transition: width 0.35s linear, background 0.2s;
+`
 
-  const handleEnd = () => {
-    // Placeholder until real game-end signal: capture elapsed time + pick 4-cut from buffer.
-    const timeMs = Date.now() - (startRef.current ?? Date.now())
-    setResult({ mode: 'solo', timeMs, score: 10 })
-    pickFourCut()
-    onFinish()
+const CenteredMessage = styled.div`
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: #fffdf2;
+  font-family: 'Suez One', Georgia, serif;
+  color: #463c3c;
+`
+
+const Spinner = styled.div`
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(133, 107, 107, 0.25);
+  border-top-color: #856b6b;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
   }
+`
+
+export default function SoloGameLayout({ onFinish, nickname }) {
+  const videoRef = useRef(null)
+  const canvasRef = useRef(null)
+  const gameIdRef = useRef(null)
+  const processingRef = useRef(false)
+  const finishedRef = useRef(false)
+
+  const [loading, setLoading] = useState(true)
+  const [errorMsg, setErrorMsg] = useState(null)
+  const [currentExpr, setCurrentExpr] = useState(null)
+  const [progress, setProgress] = useState({ current: 0, total: 10 })
+  const [roundTime, setRoundTime] = useState(ROUND_TOTAL_SEC)
+  const [targetScore, setTargetScore] = useState(0)
+  const [feedback, setFeedback] = useState(null)
+
+  const { setResult } = useGameSession()
+
+  // Start game session
+  useEffect(() => {
+    let cancelled = false
+    async function init() {
+      try {
+        const data = await startSoloGame(nickname ?? '익명')
+        if (cancelled) return
+        gameIdRef.current = data.game_id
+        setCurrentExpr(data.first_expression)
+        setProgress({ current: 0, total: data.total })
+        setLoading(false)
+      } catch (err) {
+        if (!cancelled) setErrorMsg(err.message)
+      }
+    }
+    init()
+    return () => { cancelled = true }
+  }, [nickname])
+
+  // Frame capture + send loop
+  useEffect(() => {
+    if (loading || errorMsg) return
+
+    const tick = async () => {
+      if (processingRef.current || finishedRef.current) return
+      const video = videoRef.current
+      if (!video || video.readyState < 2 || video.videoWidth === 0) return
+
+      let canvas = canvasRef.current
+      if (!canvas) {
+        canvas = document.createElement('canvas')
+        canvasRef.current = canvas
+      }
+      canvas.width = video.videoWidth
+      canvas.height = video.videoHeight
+      const ctx = canvas.getContext('2d')
+      ctx.save()
+      ctx.translate(canvas.width, 0)
+      ctx.scale(-1, 1)
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+      ctx.restore()
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.82)
+
+      processingRef.current = true
+      try {
+        const res = await sendFrame(gameIdRef.current, dataUrl)
+
+        setRoundTime(res.round_time_remaining ?? ROUND_TOTAL_SEC)
+        setTargetScore(res.target_score ?? 0)
+        setProgress((prev) => ({ ...prev, current: res.current_index ?? prev.current }))
+
+        if (res.finished) {
+          finishedRef.current = true
+          try {
+            const fin = await finishSoloGame(gameIdRef.current, nickname ?? '익명')
+            setResult({
+              mode: 'solo',
+              timeMs: fin.clear_time_ms,
+              lifeFourCut: fin.life_four_cut,
+            })
+          } catch {
+            setResult({ mode: 'solo', timeMs: res.clear_time_ms ?? 0 })
+          }
+          onFinish()
+          return
+        }
+
+        if (res.matched || res.timed_out) {
+          const nextFeedback = res.matched ? 'matched' : 'timeout'
+          setFeedback(nextFeedback)
+          setCurrentExpr(res.next_expression)
+          setRoundTime(ROUND_TOTAL_SEC)
+          setTargetScore(0)
+          setTimeout(() => setFeedback(null), 500)
+        }
+      } catch (err) {
+        console.error('[solo] frame error:', err)
+      } finally {
+        processingRef.current = false
+      }
+    }
+
+    const id = setInterval(tick, FRAME_INTERVAL_MS)
+    return () => clearInterval(id)
+  }, [loading, errorMsg, nickname, onFinish, setResult])
+
+  if (errorMsg) {
+    return (
+      <CenteredMessage>
+        <span style={{ fontSize: 32 }}>⚠️</span>
+        <span>{errorMsg}</span>
+        <span style={{ fontSize: '0.85rem', color: '#856b6b' }}>백엔드 서버가 실행 중인지 확인해 주세요.</span>
+      </CenteredMessage>
+    )
+  }
+
+  if (loading) {
+    return (
+      <CenteredMessage>
+        <Spinner />
+        <span>게임 준비 중...</span>
+      </CenteredMessage>
+    )
+  }
+
+  const timePct = Math.round((roundTime / ROUND_TOTAL_SEC) * 100)
+  const timeWarn = roundTime <= 5
 
   return (
     <Page>
       <Stage>
+        <ProgressRow>
+          라운드&nbsp;{progress.current + 1}&nbsp;/&nbsp;{progress.total}
+        </ProgressRow>
+
+        <ExpressionCard $feedback={feedback}>
+          <ExpressionEmoji>{currentExpr?.emoji ?? '🎭'}</ExpressionEmoji>
+          <ExpressionLabel>{currentExpr?.label ?? '표정을 따라해 주세요'}</ExpressionLabel>
+          <ScoreBarWrap>
+            <ScoreBarFill $score={targetScore} />
+          </ScoreBarWrap>
+        </ExpressionCard>
+
         <CamFrame>
           <WebcamSoloView videoRef={videoRef} />
           <MemoCharacterCard />
         </CamFrame>
-        <Timer />
-        <EndButton type="button" onClick={handleEnd}>게임 종료 (테스트)</EndButton>
+
+        <RoundTimerRow>
+          <TimerBarWrap>
+            <TimerBarFill $pct={timePct} $warn={timeWarn} />
+          </TimerBarWrap>
+          <TimerLabel $warn={timeWarn}>{roundTime.toFixed(1)}s</TimerLabel>
+        </RoundTimerRow>
       </Stage>
     </Page>
   )

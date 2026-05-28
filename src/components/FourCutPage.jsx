@@ -121,11 +121,20 @@ const Btn = styled.button`
 `
 
 export default function FourCutPage({ onFilter }) {
-  const { fourCutShots } = useGameSession()
+  const { fourCutShots, result } = useGameSession()
   const [composed, setComposed] = useState(null)
   const [loaded, setLoaded] = useState(false)
 
+  const lifeFourCut = result?.lifeFourCut
+
   useEffect(() => {
+    // Backend-generated four-cut takes priority
+    if (lifeFourCut) {
+      setComposed(`data:image/jpeg;base64,${lifeFourCut}`)
+      setLoaded(true)
+      return
+    }
+
     let cancelled = false
     composeFourCut(fourCutShots).then((url) => {
       if (!cancelled) {
@@ -134,9 +143,9 @@ export default function FourCutPage({ onFilter }) {
       }
     })
     return () => { cancelled = true }
-  }, [fourCutShots])
+  }, [lifeFourCut, fourCutShots])
 
-  const hasShots = fourCutShots?.some(Boolean)
+  const hasShots = lifeFourCut ? true : fourCutShots?.some(Boolean)
 
   return (
     <Page>
