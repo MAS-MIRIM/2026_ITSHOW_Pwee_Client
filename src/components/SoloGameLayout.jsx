@@ -166,7 +166,7 @@ export default function SoloGameLayout({ onFinish, nickname }) {
   const [targetScore, setTargetScore] = useState(0)
   const [feedback, setFeedback] = useState(null)
 
-  const { setResult } = useGameSession()
+  const { setResult, setFailShots } = useGameSession()
 
   // Start game session
   useEffect(() => {
@@ -228,6 +228,10 @@ export default function SoloGameLayout({ onFinish, nickname }) {
               timeMs: fin.clear_time_ms,
               lifeFourCut: fin.life_four_cut,
             })
+            const shots = (fin.fail_shots ?? []).slice(0, 4).map(
+              (b64) => (b64 ? `data:image/jpeg;base64,${b64}` : null),
+            )
+            setFailShots(shots)
           } catch {
             setResult({ mode: 'solo', timeMs: res.clear_time_ms ?? 0 })
           }
@@ -252,7 +256,7 @@ export default function SoloGameLayout({ onFinish, nickname }) {
 
     const id = setInterval(tick, FRAME_INTERVAL_MS)
     return () => clearInterval(id)
-  }, [loading, errorMsg, nickname, onFinish, setResult])
+  }, [loading, errorMsg, nickname, onFinish, setResult, setFailShots])
 
   if (errorMsg) {
     return (

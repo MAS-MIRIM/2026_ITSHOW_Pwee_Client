@@ -6,6 +6,8 @@ export function GameSessionProvider({ children }) {
   const [fourCutShots, setFourCutShots] = useState([null, null, null, null])
   const [filterShot, setFilterShot] = useState(null)
   const [result, setResultState] = useState(null)
+  const [failShots, setFailShotsState] = useState([null, null, null, null])
+  const [shareImage, setShareImageState] = useState(null)
 
   const pushCapture = useCallback((dataUrl) => {
     setCaptures((prev) => [...prev, dataUrl])
@@ -35,18 +37,40 @@ export function GameSessionProvider({ children }) {
     setFilterShot(dataUrl)
   }, [])
 
+  const setFailShots = useCallback((shots) => {
+    const normalized = Array.from({ length: 4 }, (_, i) => shots[i] ?? null)
+    setFailShotsState(normalized)
+  }, [])
+
+  const updateFailShot = useCallback((index, dataUrl) => {
+    setFailShotsState((prev) => {
+      const next = [...prev]
+      next[index] = dataUrl
+      return next
+    })
+  }, [])
+
+  const setShareImage = useCallback((dataUrl) => {
+    setShareImageState(dataUrl)
+  }, [])
+
   const ctx = useMemo(
     () => ({
       captures,
       fourCutShots,
       filterShot,
       result,
+      failShots,
+      shareImage,
       pushCapture,
       setResult,
       pickFourCut,
       setFilterShot: setFilterShotCb,
+      setFailShots,
+      updateFailShot,
+      setShareImage,
     }),
-    [captures, fourCutShots, filterShot, result, pushCapture, setResult, pickFourCut, setFilterShotCb],
+    [captures, fourCutShots, filterShot, result, failShots, shareImage, pushCapture, setResult, pickFourCut, setFilterShotCb, setFailShots, updateFailShot, setShareImage],
   )
 
   return <GameSessionContext.Provider value={ctx}>{children}</GameSessionContext.Provider>
