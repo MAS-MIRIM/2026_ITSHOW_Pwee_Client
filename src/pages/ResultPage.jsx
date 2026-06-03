@@ -285,7 +285,7 @@ export function ResultPage({ mode, nickname, onHome, onRanking, onFourCut }) {
   useEffect(() => {
     if (!lifeFourCut || uploadedRef.current) return
     uploadedRef.current = true
-    uploadPhoto(`data:image/jpeg;base64,${lifeFourCut}`)
+    uploadPhoto(lifeFourCut)
       .then((res) => { setImageId(res.image_id); setQrB64(res.qr_b64) })
       .catch((err) => setUploadErr(err.message))
   }, [lifeFourCut])
@@ -376,7 +376,7 @@ export function ResultPage({ mode, nickname, onHome, onRanking, onFourCut }) {
           <Right>
             <SectionLabel>인생네컷</SectionLabel>
             <FourCutPreview>
-              <img src={`data:image/jpeg;base64,${lifeFourCut}`} alt="인생네컷" />
+              <img src={lifeFourCut} alt="인생네컷" />
             </FourCutPreview>
           </Right>
         )}

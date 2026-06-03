@@ -335,7 +335,7 @@ export default function FourCutPage({ onFilter }) {
   useEffect(() => {
     if (dirty) return
     if (lifeFourCut) {
-      setComposed(`data:image/jpeg;base64,${lifeFourCut}`)
+      setComposed(lifeFourCut)
       setLoaded(true)
       return
     }
