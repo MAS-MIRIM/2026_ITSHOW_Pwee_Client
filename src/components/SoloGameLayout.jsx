@@ -4,6 +4,7 @@ import WebcamSoloView from './WebcamSoloView'
 import MemoCharacterCard from './MemoCharacterCard'
 import { useGameSession } from '../context/gameSession'
 import { startSoloGame, sendFrame, finishSoloGame } from '../api/soloApi'
+import { composeFourCut } from '../utils/composeFourCut'
 
 const FRAME_INTERVAL_MS = 350
 const ROUND_TOTAL_SEC = 15
@@ -37,7 +38,7 @@ const Stage = styled.div`
 const ProgressRow = styled.div`
   display: flex;
   justify-content: center;
-  font-family: 'Suez One', Georgia, serif;
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
   font-size: clamp(13px, 1.5vw, 16px);
   color: #856b6b;
   letter-spacing: 0.08em;
@@ -67,7 +68,7 @@ const ExpressionEmoji = styled.span`
 `
 
 const ExpressionLabel = styled.span`
-  font-family: 'Suez One', Georgia, serif;
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
   font-size: clamp(16px, 2.2vw, 22px);
   color: #463c3c;
 `
@@ -134,7 +135,7 @@ const CenteredMessage = styled.div`
   justify-content: center;
   gap: 16px;
   background: #fffdf2;
-  font-family: 'Suez One', Georgia, serif;
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
   color: #463c3c;
 `
 
@@ -223,15 +224,16 @@ export default function SoloGameLayout({ onFinish, nickname }) {
           finishedRef.current = true
           try {
             const fin = await finishSoloGame(gameIdRef.current, nickname ?? '익명')
-            setResult({
-              mode: 'solo',
-              timeMs: fin.clear_time_ms,
-              lifeFourCut: fin.life_four_cut,
-            })
             const shots = (fin.fail_shots ?? []).slice(0, 4).map(
               (b64) => (b64 ? `data:image/jpeg;base64,${b64}` : null),
             )
             setFailShots(shots)
+            const lifeFourCut = await composeFourCut(shots)
+            setResult({
+              mode: 'solo',
+              timeMs: fin.clear_time_ms,
+              lifeFourCut,
+            })
           } catch {
             setResult({ mode: 'solo', timeMs: res.clear_time_ms ?? 0 })
           }

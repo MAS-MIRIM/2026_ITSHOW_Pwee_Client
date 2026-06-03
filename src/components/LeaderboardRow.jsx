@@ -7,7 +7,7 @@ const Row = styled.div`
   align-items: center;
   padding: clamp(16px, 2vw, 26px) clamp(8px, 1vw, 14px);
   border-bottom: 1px solid #EDE3D6;
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
   font-size: clamp(17px, 2.1vw, 24px);
   font-weight: 500;
   color: #463C3C;
@@ -19,7 +19,7 @@ const Row = styled.div`
 
 const Rank = styled.span`
   display: block;
-  font-family: 'Suez One', 'Georgia', 'Times New Roman', serif;
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
   font-weight: 700;
   font-size: clamp(20px, 2.4vw, 28px);
   color: #463C3C;

@@ -27,7 +27,7 @@ const Stage = styled.div`
 `
 
 const Heading = styled.h1`
-  font-family: 'Suez One', Georgia, serif;
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
   font-size: clamp(34px, 5vw, 54px);
   color: #463C3C;
   margin: 0;
@@ -35,7 +35,7 @@ const Heading = styled.h1`
 `
 
 const SubLine = styled.p`
-  font-family: Georgia, serif;
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
   color: #856B6B;
   font-size: clamp(12px, 1.4vw, 14px);
   margin: -10px 0 0;
@@ -59,7 +59,7 @@ const PreviewInner = styled.div`
   align-items: center;
   justify-content: center;
   color: #B6A89A;
-  font-family: Georgia, serif;
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
   z-index: 1;
 
   img { width: 100%; height: 100%; object-fit: contain; background: #1F1A1A; }
@@ -93,7 +93,7 @@ const ThumbnailSection = styled.div`
 `
 
 const ThumbnailLabel = styled.p`
-  font-family: Georgia, serif;
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
   color: #856B6B;
   font-size: clamp(11px, 1.2vw, 13px);
   letter-spacing: 0.14em;
@@ -131,7 +131,7 @@ const SlotPlaceholder = styled.div`
   align-items: center;
   justify-content: center;
   color: #5a4e4e;
-  font-family: Georgia, serif;
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
   font-size: 11px;
 `
 
@@ -143,7 +143,7 @@ const ChangeBtn = styled.button`
   padding: 4px 0;
   background: rgba(0, 0, 0, 0.55);
   color: #FFFDF2;
-  font-family: 'Suez One', Georgia, serif;
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
   font-size: 10px;
   border: none;
   cursor: pointer;
@@ -160,7 +160,7 @@ const Actions = styled.div`
 `
 
 const Btn = styled.button`
-  font-family: 'Suez One', Georgia, serif;
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
   font-size: clamp(14px, 1.6vw, 18px);
   border-radius: 999px;
   padding: 14px 28px;
@@ -231,7 +231,7 @@ const ModalBtn = styled.button`
   border-radius: 12px;
   padding: 12px;
   border: none;
-  font-family: 'Suez One', Georgia, serif;
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
   font-size: 15px;
   cursor: pointer;
 
@@ -289,7 +289,7 @@ function RetakeModal({ onCapture, onCancel }) {
       <ModalBox>
         {error
           ? (
-            <div style={{ padding: 24, color: '#FFFDF2', fontFamily: 'Georgia, serif', textAlign: 'center' }}>
+            <div style={{ padding: 24, color: '#FFFDF2', fontFamily: "'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif", textAlign: 'center' }}>
               {error}
             </div>
           )
@@ -335,7 +335,7 @@ export default function FourCutPage({ onFilter }) {
   useEffect(() => {
     if (dirty) return
     if (lifeFourCut) {
-      setComposed(`data:image/jpeg;base64,${lifeFourCut}`)
+      setComposed(lifeFourCut)
       setLoaded(true)
       return
     }

@@ -24,7 +24,7 @@ const Stage = styled.div`
 `
 
 const Heading = styled.h2`
-  font-family: 'Suez One', Georgia, serif;
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
   font-size: clamp(22px, 3vw, 30px);
   color: #463c3c;
   margin: 0;
@@ -66,7 +66,7 @@ const QRBox = styled.div`
 `
 
 const QRLabel = styled.p`
-  font-family: Georgia, serif;
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
   font-size: clamp(11px, 1.3vw, 13px);
   color: #856b6b;
   letter-spacing: 0.1em;
@@ -99,7 +99,7 @@ const EmailForm = styled.form`
 `
 
 const EmailLabel = styled.label`
-  font-family: Georgia, serif;
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
   font-size: clamp(12px, 1.4vw, 14px);
   color: #856b6b;
   letter-spacing: 0.06em;
@@ -111,7 +111,7 @@ const EmailInput = styled.input`
   border-radius: 12px;
   border: 2px solid rgba(133, 107, 107, 0.35);
   background: #fff;
-  font-family: inherit;
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
   font-size: 15px;
   color: #463c3c;
   box-sizing: border-box;
@@ -137,7 +137,7 @@ const BtnRow = styled.div`
 
 const Btn = styled.button`
   flex: 1;
-  font-family: 'Suez One', Georgia, serif;
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
   font-size: clamp(14px, 1.6vw, 17px);
   border-radius: 999px;
   padding: 13px 16px;

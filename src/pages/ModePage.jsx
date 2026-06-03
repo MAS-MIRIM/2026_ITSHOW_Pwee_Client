@@ -42,19 +42,15 @@ const Subtitle = styled.p`
 
 const ModeGrid = styled.section`
   margin-top: 48px;
-  width: min(100%, 760px);
+  width: min(100%, 420px);
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 16px;
-
-  @media (max-width: 640px) {
-    grid-template-columns: 1fr;
-  }
 `;
 
 const ModeButton = styled.button`
-  min-height: 140px;
-  padding: 18px 20px;
+  min-height: 72px;
+  padding: 16px 20px;
   border: 2px solid #856b6b;
   border-radius: 6px;
   background: ${({ $active }) => ($active ? "#856b6b" : "#ffffff")};
@@ -72,8 +68,9 @@ const ModeButton = styled.button`
 `;
 
 const ModeName = styled.strong`
-  font-size: 1.1rem;
-  font-weight: 500;
+  font-family: 'Suez One', Georgia, serif;
+  font-size: 1.4rem;
+  letter-spacing: 0.04em;
 `;
 
 export function ModePage({ mode, modeContent, onSelect }) {
@@ -86,14 +83,14 @@ export function ModePage({ mode, modeContent, onSelect }) {
         </Copy>
 
         <ModeGrid>
-          {Object.entries(modeContent).map(([key, item]) => (
+          {Object.keys(modeContent).map((key) => (
             <ModeButton
               key={key}
               type="button"
               $active={mode === key}
               onClick={() => onSelect(key)}
             >
-              <ModeName>{item.label}</ModeName>
+              <ModeName>{key.toUpperCase()}</ModeName>
             </ModeButton>
           ))}
         </ModeGrid>

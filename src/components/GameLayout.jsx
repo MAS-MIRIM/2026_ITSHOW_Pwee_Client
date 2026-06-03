@@ -41,7 +41,7 @@ const CamFrame = styled.div`
 
 const EndButton = styled.button`
   align-self: center;
-  font-family: 'Suez One', Georgia, serif;
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
   font-size: clamp(14px, 1.6vw, 18px);
   color: #463C3C;
   background: #F8E9C8;

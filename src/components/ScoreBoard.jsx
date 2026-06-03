@@ -9,7 +9,7 @@ const Wrap = styled.div`
 `
 
 const Label = styled.span`
-  font-family: 'Suez One', 'Georgia', 'Times New Roman', serif;
+  font-family: 'Suez One', Georgia, serif;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.18em;
@@ -21,7 +21,7 @@ const Label = styled.span`
 `
 
 const Value = styled.span`
-  font-family: 'Suez One', 'Georgia', 'Times New Roman', serif;
+  font-family: 'Suez One', Georgia, serif;
   font-size: clamp(22px, 3.6vw, 34px);
   font-weight: 700;
   line-height: 1;

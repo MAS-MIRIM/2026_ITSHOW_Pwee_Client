@@ -9,7 +9,7 @@ const Wrap = styled.div`
 `
 
 const Display = styled.span`
-  font-family: 'Suez One', 'Georgia', 'Times New Roman', serif;
+  font-family: 'Suez One', Georgia, serif;
   font-size: clamp(22px, 2.8vw, 36px);
   font-weight: 600;
   color: #463C3C;
