@@ -96,7 +96,7 @@ export function GuidePage({ message, onNext, step }) {
           </IconBadge>
           <Message>
             <KoreanMessage>{koreanMessage}</KoreanMessage>
-            <EnglishMessage>{englishMessage}</EnglishMessage>
+            {englishMessage && <EnglishMessage>{englishMessage}</EnglishMessage>}
           </Message>
         </MessageFrame>
       </Panel>

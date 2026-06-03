@@ -54,6 +54,10 @@ const TextInput = styled.input`
     color: #856b6b;
     opacity: 0.62;
   }
+
+  &:focus {
+    outline: none;
+  }
 `;
 
 export function NamePage({ nickname, onNext, setNickname }) {

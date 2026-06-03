@@ -52,7 +52,7 @@ const TopBar = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-family: 'Suez One', Georgia, serif;
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
   padding: 0 4px;
 `
 
@@ -63,7 +63,7 @@ const Title = styled.h1`
 `
 
 const Status = styled.div`
-  font-family: Georgia, serif;
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
   font-size: clamp(11px, 1.3vw, 13px);
   color: #856B6B;
   letter-spacing: 0.16em;
@@ -90,7 +90,7 @@ const Ring = styled.svg`
 
 const RingCount = styled.span`
   position: relative;
-  font-family: 'Suez One', Georgia, serif;
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
   font-size: 24px;
   color: ${({ $warn }) => ($warn ? '#C44545' : '#463C3C')};
   font-variant-numeric: tabular-nums;
@@ -144,7 +144,7 @@ const StatusOverlay = styled.div`
   gap: 14px;
   background: ${({ $error }) => ($error ? 'rgba(80, 20, 20, 0.92)' : 'rgba(31, 26, 26, 0.78)')};
   color: #FFFDF2;
-  font-family: Georgia, serif;
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
   text-align: center;
   padding: 18px;
   z-index: 3;
@@ -158,7 +158,7 @@ const StatusOverlay = styled.div`
     animation: ${spin} 0.9s linear infinite;
   }
   .label {
-    font-family: 'Suez One', Georgia, serif;
+    font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
     font-size: clamp(13px, 1.5vw, 16px);
     letter-spacing: 0.1em;
   }
@@ -171,7 +171,7 @@ const StatusOverlay = styled.div`
 `
 
 const RetryBtn = styled.button`
-  font-family: 'Suez One', Georgia, serif;
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
   font-size: 14px;
   color: #463C3C;
   background: #F8E9C8;
@@ -189,7 +189,7 @@ const FilterRow = styled.div`
 `
 
 const Chip = styled.button`
-  font-family: 'Suez One', Georgia, serif;
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
   font-size: clamp(13px, 1.4vw, 15px);
   border-radius: 999px;
   padding: 10px 18px 10px 14px;
@@ -210,7 +210,7 @@ const Chip = styled.button`
 
 const Shutter = styled.button`
   align-self: center;
-  font-family: 'Suez One', Georgia, serif;
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
   font-size: clamp(16px, 1.8vw, 20px);
   color: #FFFDF2;
   background: #C44545;

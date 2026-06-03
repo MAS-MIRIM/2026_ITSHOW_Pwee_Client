@@ -38,7 +38,7 @@ const Stage = styled.div`
 const ProgressRow = styled.div`
   display: flex;
   justify-content: center;
-  font-family: 'Suez One', Georgia, serif;
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
   font-size: clamp(13px, 1.5vw, 16px);
   color: #856b6b;
   letter-spacing: 0.08em;
@@ -68,7 +68,7 @@ const ExpressionEmoji = styled.span`
 `
 
 const ExpressionLabel = styled.span`
-  font-family: 'Suez One', Georgia, serif;
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
   font-size: clamp(16px, 2.2vw, 22px);
   color: #463c3c;
 `
@@ -135,7 +135,7 @@ const CenteredMessage = styled.div`
   justify-content: center;
   gap: 16px;
   background: #fffdf2;
-  font-family: 'Suez One', Georgia, serif;
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
   color: #463c3c;
 `
 

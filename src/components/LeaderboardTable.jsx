@@ -15,7 +15,7 @@ const Header = styled.div`
   align-items: center;
   padding: clamp(16px, 2vw, 26px) clamp(8px, 1vw, 14px);
   border-bottom: 1px solid #E5DFD3;
-  font-family: 'Suez One', 'Georgia', 'Times New Roman', serif;
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
   font-size: clamp(20px, 2.6vw, 28px);
   font-weight: 700;
   color: #463C3C;

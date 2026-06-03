@@ -15,7 +15,7 @@ import { SharePage } from './pages/SharePage'
 import { GameSessionProvider } from './context/GameSessionProvider'
 
 const GlobalStyle = createGlobalStyle`
-  @import url('https://fonts.googleapis.com/css2?family=Gruppo&family=Suez+One&display=swap');
+  @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@latest/dist/web/static/pretendard.min.css');
 
   :root {
     font-family:

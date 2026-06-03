@@ -18,7 +18,7 @@ const BackButton = styled.button`
   position: absolute;
   top: clamp(16px, 2.5vw, 28px);
   right: clamp(16px, 2.5vw, 28px);
-  font-family: 'Suez One', Georgia, serif;
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
   font-size: clamp(13px, 1.4vw, 16px);
   color: #463C3C;
   background: #F8E9C8;

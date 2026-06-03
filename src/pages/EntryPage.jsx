@@ -200,7 +200,7 @@ const Ribbon = styled.img`
 
 const RibbonText = styled.span`
   position: absolute;
-  top: 285px;
+  top: 275px;
   left: 52.5%;
   transform: translateX(-50%) rotate(-4deg);
   z-index: 2;
@@ -218,9 +218,9 @@ const Button = styled.button`
   height: 78px;
   border-radius: 999px;
   border: 4px solid #856b6b;
-  background: #fffdf2;
+  background: #FFF9E4;
   color: #856b6b;
-  font-family: "Suez One", serif;
+  font-family: "Suez One", Georgia, serif;
   font-size: 21px;
   font-weight: bold;
   letter-spacing: 1px;
