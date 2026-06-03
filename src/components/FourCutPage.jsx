@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components'
 import { useGameSession } from '../context/gameSession'
 import { composeFourCut } from '../utils/composeFourCut'
 import { downloadDataUrl } from '../utils/downloadDataUrl'
+import { uploadPhoto, sendEmail } from '../api/shareApi'
 import RoughFrame from './RoughFrame'
 import tape from '../assets/tape.svg'
 
@@ -188,6 +189,129 @@ const Btn = styled.button`
   &:disabled { opacity: 0.45; cursor: not-allowed; }
 `
 
+/* ── 공유 섹션 ── */
+const ShareSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: clamp(260px, 38vw, 380px);
+  padding-top: 8px;
+  border-top: 1.5px solid rgba(133, 107, 107, 0.18);
+`
+
+const ShareLabel = styled.p`
+  font-family: 'Suez One', Georgia, serif;
+  font-size: clamp(13px, 1.4vw, 15px);
+  color: #463C3C;
+  margin: 0;
+  letter-spacing: 0.02em;
+  align-self: flex-start;
+`
+
+const spin = keyframes`to { transform: rotate(360deg); }`
+
+const Spinner = styled.div`
+  width: 22px;
+  height: 22px;
+  border: 3px solid rgba(133, 107, 107, 0.2);
+  border-top-color: #856b6b;
+  border-radius: 50%;
+  animation: ${spin} 0.9s linear infinite;
+`
+
+const QRRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+`
+
+const QRBox = styled.div`
+  flex-shrink: 0;
+  width: clamp(80px, 14vw, 100px);
+  aspect-ratio: 1;
+  border-radius: 10px;
+  background: #fff;
+  border: 1.5px solid #e5dfd3;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+
+  img { width: 100%; height: 100%; object-fit: contain; display: block; }
+`
+
+const QRInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`
+
+const QRText = styled.p`
+  font-family: 'Suez One', Georgia, serif;
+  font-size: clamp(12px, 1.3vw, 14px);
+  color: #463C3C;
+  margin: 0;
+`
+
+const QRSub = styled.p`
+  font-family: Georgia, serif;
+  font-size: 11px;
+  color: #856b6b;
+  margin: 0;
+`
+
+const ErrMsg = styled.p`
+  font-size: 11px;
+  color: #c44545;
+  margin: 0;
+`
+
+const EmailForm = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+`
+
+const EmailInput = styled.input`
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(133, 107, 107, 0.35);
+  background: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  color: #463c3c;
+  box-sizing: border-box;
+
+  &:focus { outline: none; border-color: #856b6b; }
+  &:disabled { background: #f5f0e8; }
+`
+
+const SendBtn = styled.button`
+  border-radius: 10px;
+  padding: 10px;
+  border: none;
+  background: #463C3C;
+  color: #FFFDF2;
+  font-family: 'Suez One', Georgia, serif;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform 0.1s;
+  width: 100%;
+
+  &:active { transform: translateY(2px); }
+  &:disabled { opacity: 0.45; cursor: not-allowed; }
+`
+
+const StatusMsg = styled.p`
+  font-size: 12px;
+  text-align: center;
+  margin: 0;
+  color: ${({ $ok }) => ($ok ? '#2e7d32' : '#c44545')};
+`
+
 // --- Retake Modal ---
 
 const ModalOverlay = styled.div`
@@ -314,7 +438,7 @@ function RetakeModal({ onCapture, onCancel }) {
 
 // --- Main component ---
 
-export default function FourCutPage({ onFilter }) {
+export default function FourCutPage({ onFilter, onBack }) {
   const { result, failShots, updateFailShot } = useGameSession()
   const lifeFourCut = result?.lifeFourCut
 
@@ -323,6 +447,14 @@ export default function FourCutPage({ onFilter }) {
   const [loaded, setLoaded] = useState(false)
   const [dirty, setDirty] = useState(false)
   const [retakeIndex, setRetakeIndex] = useState(null)
+
+  const [imageId, setImageId] = useState(null)
+  const [qrB64, setQrB64] = useState(null)
+  const [uploadErr, setUploadErr] = useState(null)
+  const [email, setEmail] = useState('')
+  const [sending, setSending] = useState(false)
+  const [sendStatus, setSendStatus] = useState(null)
+  const uploadedRef = useRef(false)
 
   // Sync slots if failShots arrives after mount (e.g. context update)
   useEffect(() => {
@@ -351,11 +483,24 @@ export default function FourCutPage({ onFilter }) {
     if (!dirty) return
     let cancelled = false
     setLoaded(false)
+    uploadedRef.current = false
+    setImageId(null)
+    setQrB64(null)
+    setUploadErr(null)
     composeFourCut(slots).then((url) => {
       if (!cancelled) { setComposed(url); setLoaded(true) }
     })
     return () => { cancelled = true }
   }, [dirty, slots])
+
+  // Upload composed image to get QR
+  useEffect(() => {
+    if (!composed || !loaded || uploadedRef.current) return
+    uploadedRef.current = true
+    uploadPhoto(composed)
+      .then((res) => { setImageId(res.image_id); setQrB64(res.qr_b64) })
+      .catch((err) => setUploadErr(err.message))
+  }, [composed, loaded])
 
   const handleCapture = useCallback((dataUrl) => {
     const idx = retakeIndex
@@ -370,6 +515,22 @@ export default function FourCutPage({ onFilter }) {
   }, [retakeIndex, updateFailShot])
 
   const hasShots = lifeFourCut ? true : slots.some(Boolean)
+
+  const handleSendEmail = async (e) => {
+    e.preventDefault()
+    if (!email.trim() || !imageId) return
+    setSending(true)
+    setSendStatus(null)
+    try {
+      await sendEmail(email.trim(), imageId)
+      setSendStatus({ ok: true, msg: '메일을 전송했습니다!' })
+      setEmail('')
+    } catch (err) {
+      setSendStatus({ ok: false, msg: err.message })
+    } finally {
+      setSending(false)
+    }
+  }
 
   return (
     <Page>
@@ -413,6 +574,11 @@ export default function FourCutPage({ onFilter }) {
         </ThumbnailSection>
 
         <Actions>
+          {onBack && (
+            <Btn type="button" className="secondary" onClick={onBack}>
+              ← 돌아가기
+            </Btn>
+          )}
           <Btn
             type="button"
             className="secondary"
@@ -425,6 +591,42 @@ export default function FourCutPage({ onFilter }) {
             필터로 사진 찍기 →
           </Btn>
         </Actions>
+
+        {hasShots && (
+          <ShareSection>
+            <ShareLabel>공유하기</ShareLabel>
+
+            <QRRow>
+              <QRBox>
+                {uploadErr
+                  ? <ErrMsg style={{ fontSize: 9, textAlign: 'center', padding: 4 }}>오류</ErrMsg>
+                  : qrB64
+                    ? <img src={`data:image/png;base64,${qrB64}`} alt="QR" />
+                    : <Spinner />
+                }
+              </QRBox>
+              <QRInfo>
+                <QRText>QR 스캔</QRText>
+                <QRSub>카메라로 스캔하면{'\n'}사진을 다운로드해요</QRSub>
+                {uploadErr && <ErrMsg>{uploadErr}</ErrMsg>}
+              </QRInfo>
+            </QRRow>
+
+            <EmailForm onSubmit={handleSendEmail}>
+              <EmailInput
+                type="email"
+                placeholder="이메일로 받기"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={sending || !imageId}
+              />
+              {sendStatus && <StatusMsg $ok={sendStatus.ok}>{sendStatus.msg}</StatusMsg>}
+              <SendBtn type="submit" disabled={sending || !email.trim() || !imageId}>
+                {sending ? '전송 중...' : '📧 이메일로 전송'}
+              </SendBtn>
+            </EmailForm>
+          </ShareSection>
+        )}
       </Stage>
     </Page>
   )

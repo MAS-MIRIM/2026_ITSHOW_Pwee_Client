@@ -1,4 +1,4 @@
-const BASE = 'http://localhost:5001'
+export const BASE = 'http://localhost:5001'
 
 async function request(path, options) {
   const res = await fetch(`${BASE}${path}`, options)
@@ -23,4 +23,15 @@ export function sendEmail(email, imageId) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, image_id: imageId }),
   })
+}
+
+export function uploadVideo(gameId, videoBlob) {
+  const fd = new FormData()
+  fd.append('game_id', gameId)
+  fd.append('file', videoBlob, `${gameId}.webm`)
+  return request('/api/share/upload-video', { method: 'POST', body: fd })
+}
+
+export function fetchLeaderboard(limit = 20) {
+  return request(`/api/leaderboard/solo?limit=${limit}`)
 }

@@ -169,7 +169,7 @@ function App() {
           )}
 
           {page === 'game' && mode === 'multi' && (
-            <GameLayout onFinish={finishGame} />
+            <GameLayout onFinish={finishGame} nickname={nickname} />
           )}
 
           {page === 'game' && mode !== 'multi' && (
@@ -182,13 +182,13 @@ function App() {
               nickname={nickname}
               onHome={goHome}
               onRanking={openRankingPage}
-              onFourCut={goToFourCut}
+              onFilter={goToFilter}
             />
           )}
 
-          {page === 'fourcut' && <FourCutPage onFilter={goToFilter} />}
+          {page === 'fourcut' && <FourCutPage onFilter={goToFilter} onBack={() => setPage('result')} />}
 
-          {page === 'filter' && <FilterPage onDone={goToShare} />}
+          {page === 'filter' && <FilterPage onDone={goToShare} onBack={() => setPage('result')} />}
 
           {page === 'share' && <SharePage onRestart={goHome} />}
         </PageFrame>

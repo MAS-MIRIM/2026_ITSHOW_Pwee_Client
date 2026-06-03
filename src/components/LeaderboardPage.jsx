@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import LeaderboardPanel from './LeaderboardPanel'
+import { fetchLeaderboard } from '../api/shareApi'
 
 const Page = styled.div`
   position: fixed;
@@ -31,13 +33,36 @@ const BackButton = styled.button`
   &:hover { background: #FFE9A8; }
 `
 
-export default function LeaderboardPage({ rankings = [], onBack }) {
+function formatMs(ms) {
+  if (!ms) return '00:00.00'
+  const totalSec = ms / 1000
+  const min = Math.floor(totalSec / 60).toString().padStart(2, '0')
+  const sec = (totalSec % 60).toFixed(2).padStart(5, '0')
+  return `${min}:${sec}`
+}
+
+export default function LeaderboardPage({ rankings: fallback = [], onBack }) {
+  const [rankings, setRankings] = useState(null)
+
+  useEffect(() => {
+    fetchLeaderboard(20)
+      .then((res) => {
+        const rows = (res.leaderboard ?? []).map((r, i) => ({
+          rank: i + 1,
+          name: r.username ?? r.user_id,
+          time: formatMs(r.clear_time_ms),
+        }))
+        setRankings(rows)
+      })
+      .catch(() => setRankings(fallback))
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
     <Page>
       {onBack && (
         <BackButton type="button" onClick={onBack}>← 돌아가기</BackButton>
       )}
-      <LeaderboardPanel rankings={rankings} />
+      <LeaderboardPanel rankings={rankings ?? fallback} />
     </Page>
   )
 }

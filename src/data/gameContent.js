@@ -35,7 +35,6 @@ export const modeContent = {
   },
 };
 
-
 export const guideMessages = {
   solo: [
     "카메라를 봐주세요!\nLook at the camera please!",
@@ -45,13 +44,13 @@ export const guideMessages = {
   multi: [
     "카메라를 봐주세요!\nLook at the camera please!",
     "화면에 나오는 표정을 따라해주세요!\nFollow the expression on the screen!",
-    "상대방보다 빨리 따라할 경우, 점수가 추가됩니다!\nIf you follow the expression faster than your opponent, you'll get extra points!",
+    "상대방보다 빨리 10점을 채울 경우, 게임에서 승리합니다!\nIf you follow the expression faster than your opponent, you'll get extra points!",
   ],
 };
 
 export const rankingData = [
   { rank: 1, name: "정희진", time: "01:00" },
   { rank: 2, name: "박홍준", time: "01:10" },
-  { rank: 3, name: "윤건",   time: "01:20" },
+  { rank: 3, name: "윤건", time: "01:20" },
   { rank: 4, name: "우지영", time: "01:30" },
 ];

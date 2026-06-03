@@ -4,7 +4,6 @@ import WebcamSoloView from './WebcamSoloView'
 import MemoCharacterCard from './MemoCharacterCard'
 import { useGameSession } from '../context/gameSession'
 import { startSoloGame, sendFrame, finishSoloGame } from '../api/soloApi'
-import { composeFourCut } from '../utils/composeFourCut'
 
 const FRAME_INTERVAL_MS = 350
 const ROUND_TOTAL_SEC = 15
@@ -224,16 +223,16 @@ export default function SoloGameLayout({ onFinish, nickname }) {
           finishedRef.current = true
           try {
             const fin = await finishSoloGame(gameIdRef.current, nickname ?? '익명')
-            const shots = (fin.fail_shots ?? []).slice(0, 4).map(
-              (b64) => (b64 ? `data:image/jpeg;base64,${b64}` : null),
-            )
-            setFailShots(shots)
-            const lifeFourCut = await composeFourCut(shots)
             setResult({
               mode: 'solo',
               timeMs: fin.clear_time_ms,
-              lifeFourCut,
+              lifeFourCut: fin.life_four_cut,
             })
+            const shots = Array.from({ length: 4 }, (_, i) => {
+              const b64 = fin.fail_shots?.[i]
+              return b64 ? `data:image/jpeg;base64,${b64}` : null
+            })
+            setFailShots(shots)
           } catch {
             setResult({ mode: 'solo', timeMs: res.clear_time_ms ?? 0 })
           }

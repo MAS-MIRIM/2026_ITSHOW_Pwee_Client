@@ -299,7 +299,7 @@ function formatTime(ms) {
 }
 
 /* ── 컴포넌트 ── */
-export function ResultPage({ mode, nickname, onHome, onRanking, onFourCut }) {
+export function ResultPage({ mode, nickname, onHome, onRanking, onFilter }) {
   const { result } = useGameSession()
 
   const timeDisplay = formatTime(result?.timeMs)
@@ -412,7 +412,7 @@ export function ResultPage({ mode, nickname, onHome, onRanking, onFourCut }) {
                 </SendBtn>
               </EmailForm>
 
-              <PrimaryBtn type="button" onClick={onFourCut}>사진 찍기 →</PrimaryBtn>
+              <PrimaryBtn type="button" onClick={onFilter}>사진 찍기 →</PrimaryBtn>
             </ShareCard>
           )}
         </Left>

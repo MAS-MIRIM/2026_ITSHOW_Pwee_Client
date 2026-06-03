@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import styled, { css, keyframes } from 'styled-components'
 import { useGameSession } from '../context/gameSession'
 import { getFaceLandmarker, LANDMARK } from '../utils/faceLandmarker'
+import { uploadVideo } from '../api/shareApi'
 import RoughFrame from './RoughFrame'
 import bunnyUrl from '../assets/filters/bunny-ears.svg'
 import glassesUrl from '../assets/filters/glasses.svg'
@@ -10,6 +11,7 @@ import heartUrl from '../assets/filters/heart.svg'
 const COUNTDOWN_SEC = 15
 const RING_R = 28
 const RING_C = 2 * Math.PI * RING_R
+const REC_SEC = 5
 
 const FILTERS = [
   { id: 'none', label: '없음', emoji: '✕' },
@@ -225,6 +227,22 @@ const Shutter = styled.button`
   &:disabled { opacity: 0.55; cursor: not-allowed; }
 `
 
+const RecordBtn = styled.button`
+  align-self: center;
+  font-family: 'Suez One', Georgia, serif;
+  font-size: clamp(14px, 1.6vw, 17px);
+  color: ${({ $recording }) => ($recording ? '#FFFDF2' : '#463C3C')};
+  background: ${({ $recording }) => ($recording ? '#856B6B' : '#F8E9C8')};
+  border: 2px solid #856B6B;
+  border-radius: 999px;
+  padding: 12px 28px;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.2s;
+
+  &:active { transform: scale(0.96); }
+  &:disabled { opacity: 0.55; cursor: not-allowed; }
+`
+
 function loadSticker(url) {
   return new Promise((resolve) => {
     const img = new Image()
@@ -281,7 +299,7 @@ function drawStickers(ctx, landmarks, filter, stickers, w, h) {
   }
 }
 
-function FilterPageInner({ onRetry, onDone }) {
+function FilterPageInner({ onRetry, onDone, onBack }) {
   const { setFilterShot } = useGameSession()
   const videoRef = useRef(null)
   const overlayRef = useRef(null)
@@ -300,6 +318,10 @@ function FilterPageInner({ onRetry, onDone }) {
   const [cameraError, setCameraError] = useState(null)
   const [modelError, setModelError] = useState(null)
   const [countdown, setCountdown] = useState(COUNTDOWN_SEC)
+  const [recording, setRecording] = useState(false)
+  const [recCountdown, setRecCountdown] = useState(0)
+  const [videoStatus, setVideoStatus] = useState(null) // null | 'uploading' | 'done' | 'error'
+  const recorderRef = useRef(null)
 
   useEffect(() => { filterRef.current = filter }, [filter])
 
@@ -471,6 +493,79 @@ function FilterPageInner({ onRetry, onDone }) {
     onDone()
   }, [onDone, setFilterShot])
 
+  const startRecording = useCallback(() => {
+    if (recording) return
+    const video = videoRef.current
+    const overlay = overlayRef.current
+    if (!video || video.videoWidth === 0) return
+
+    const out = document.createElement('canvas')
+    out.width = video.videoWidth
+    out.height = video.videoHeight
+    const octx = out.getContext('2d')
+
+    let animId
+    const drawFrame = () => {
+      if (video.readyState >= 2 && video.videoWidth) {
+        if (out.width !== video.videoWidth) out.width = video.videoWidth
+        if (out.height !== video.videoHeight) out.height = video.videoHeight
+        octx.save()
+        octx.translate(out.width, 0)
+        octx.scale(-1, 1)
+        octx.drawImage(video, 0, 0)
+        if (overlay) octx.drawImage(overlay, 0, 0)
+        octx.restore()
+      }
+      animId = requestAnimationFrame(drawFrame)
+    }
+    animId = requestAnimationFrame(drawFrame)
+
+    const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
+      ? 'video/webm;codecs=vp9'
+      : 'video/webm'
+    const canvasStream = out.captureStream(25)
+    const recorder = new MediaRecorder(canvasStream, { mimeType })
+    const chunks = []
+
+    recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data) }
+    recorder.onstop = () => {
+      cancelAnimationFrame(animId)
+      const blob = new Blob(chunks, { type: mimeType })
+
+      // local download
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'pwee-video.webm'
+      a.click()
+      URL.revokeObjectURL(url)
+
+      // server upload
+      const gameId = `filter-${Date.now()}`
+      setVideoStatus('uploading')
+      uploadVideo(gameId, blob)
+        .then(() => setVideoStatus('done'))
+        .catch(() => setVideoStatus('error'))
+    }
+
+    recorder.start()
+    recorderRef.current = recorder
+    setRecording(true)
+    setRecCountdown(REC_SEC)
+
+    const id = setInterval(() => {
+      setRecCountdown((s) => {
+        if (s <= 1) {
+          clearInterval(id)
+          recorder.stop()
+          setRecording(false)
+          return 0
+        }
+        return s - 1
+      })
+    }, 1000)
+  }, [recording])
+
   // Countdown — only starts once camera is up so users aren't auto-shuttered into a blank shot.
   useEffect(() => {
     if (!cameraReady) return undefined
@@ -495,7 +590,26 @@ function FilterPageInner({ onRetry, onDone }) {
     <Page>
       <Stage>
         <TopBar>
-          <div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            {onBack && (
+              <button
+                type="button"
+                onClick={onBack}
+                style={{
+                  alignSelf: 'flex-start',
+                  fontFamily: "'Suez One', Georgia, serif",
+                  fontSize: 13,
+                  color: '#856b6b',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: 0,
+                  letterSpacing: '0.06em',
+                }}
+              >
+                ← 돌아가기
+              </button>
+            )}
             <Title>AR 필터 촬영</Title>
             <Status>
               {cameraError
@@ -557,12 +671,33 @@ function FilterPageInner({ onRetry, onDone }) {
         </FilterRow>
 
         <Shutter type="button" onClick={takeShot} disabled={!cameraReady}>● 지금 찍기</Shutter>
+        <RecordBtn
+          type="button"
+          $recording={recording}
+          onClick={startRecording}
+          disabled={!cameraReady || recording}
+        >
+          {recording ? `⏺ 녹화 중 ${recCountdown}s` : '⏺ 동영상 녹화 (5초)'}
+        </RecordBtn>
+        {videoStatus && (
+          <p style={{
+            textAlign: 'center',
+            fontFamily: 'Georgia, serif',
+            fontSize: 13,
+            color: videoStatus === 'done' ? '#2e7d32' : videoStatus === 'error' ? '#c44545' : '#856b6b',
+            margin: 0,
+          }}>
+            {videoStatus === 'uploading' && '영상 서버 저장 중...'}
+            {videoStatus === 'done' && '영상 서버 저장 완료!'}
+            {videoStatus === 'error' && '영상 서버 저장 실패'}
+          </p>
+        )}
       </Stage>
     </Page>
   )
 }
 
-export default function FilterPage({ onDone }) {
+export default function FilterPage({ onDone, onBack }) {
   const [retryKey, setRetryKey] = useState(0)
-  return <FilterPageInner key={retryKey} onRetry={() => setRetryKey((k) => k + 1)} onDone={onDone} />
+  return <FilterPageInner key={retryKey} onRetry={() => setRetryKey((k) => k + 1)} onDone={onDone} onBack={onBack} />
 }

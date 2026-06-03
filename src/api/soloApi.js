@@ -25,10 +25,14 @@ export function sendFrame(gameId, imageBase64) {
   })
 }
 
-export function finishSoloGame(gameId, userName) {
+export function finishSoloGame(gameId, userName, videoUrl) {
   return request('/api/solo/finish', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ game_id: gameId, user_name: userName }),
+    body: JSON.stringify({
+      game_id: gameId,
+      user_name: userName,
+      ...(videoUrl ? { video_url: videoUrl } : {}),
+    }),
   })
 }

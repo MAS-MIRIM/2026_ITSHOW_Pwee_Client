@@ -30,10 +30,10 @@ const Value = styled.span`
   margin-top: -2px;
 `
 
-export default function ScoreBoard({ value = 0 }) {
+export default function ScoreBoard({ value = 0, label }) {
   return (
     <Wrap>
-      <Label>score</Label>
+      <Label>{label ?? 'score'}</Label>
       <Value>{value}</Value>
     </Wrap>
   )
