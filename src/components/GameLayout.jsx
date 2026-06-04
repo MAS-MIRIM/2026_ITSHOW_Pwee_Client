@@ -5,6 +5,7 @@ import MemoCharacterCard from './MemoCharacterCard'
 import ScoreBoard from './ScoreBoard'
 import { useGameSession } from '../context/gameSession'
 import { getOrCreateUser, createSocket } from '../api/multiApi'
+import memoge from '../assets/memoge.svg'
 
 const FRAME_MS = 350
 const BASE_SERVER = 'http://localhost:5001'
@@ -69,37 +70,45 @@ const flash = keyframes`
 `
 
 const ExprCard = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 16px 28px 18px;
-  border-radius: 4px;
-  background: ${({ $feedback }) =>
-    $feedback === 'won' ? '#d4edda' : $feedback === 'penalty' ? '#fde0de' : '#FFF176'};
-  box-shadow: 3px 4px 10px rgba(0,0,0,0.18), inset 0 -3px 0 rgba(0,0,0,0.07);
-  transition: background 0.25s;
   position: relative;
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 6px;
-    background: rgba(0,0,0,0.08);
-    border-radius: 4px 4px 0 0;
-  }
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(180px, 24vw, 280px);
   ${({ $feedback }) => $feedback && css`animation: ${flash} 0.5s ease;`}
 `
 
+const MemoImg = styled.img`
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: ${({ $feedback }) =>
+    $feedback === 'won' ? 'hue-rotate(100deg) saturate(0.7)' :
+    $feedback === 'penalty' ? 'hue-rotate(-30deg) saturate(1.2) brightness(1.05)' :
+    'none'};
+  transition: filter 0.25s ease;
+`
+
+const ExprOverlay = styled.div`
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding-bottom: 4px;
+`
+
 const ExprEmoji = styled.span`
-  font-size: clamp(32px, 5vw, 52px);
+  font-size: clamp(28px, 4vw, 44px);
   line-height: 1;
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
 `
 
 const ExprLabel = styled.span`
   font-family: 'Suez One', Georgia, serif;
-  font-size: clamp(14px, 1.8vw, 20px);
+  font-size: clamp(13px, 1.6vw, 18px);
   color: #463c3c;
 `
 
@@ -429,8 +438,11 @@ export default function GameLayout({ onFinish, nickname }) {
         <ExprRow>
           <RoundBadge>{round} / {total}</RoundBadge>
           <ExprCard $feedback={feedback}>
-            <ExprEmoji>{currentExpr?.emoji ?? '🎭'}</ExprEmoji>
-            <ExprLabel>{currentExpr?.label ?? '표정을 따라해 주세요'}</ExprLabel>
+            <MemoImg src={memoge} alt="" $feedback={feedback} />
+            <ExprOverlay>
+              <ExprEmoji>{currentExpr?.emoji ?? '🎭'}</ExprEmoji>
+              <ExprLabel>{currentExpr?.label ?? '표정을 따라해 주세요'}</ExprLabel>
+            </ExprOverlay>
           </ExprCard>
         </ExprRow>
 

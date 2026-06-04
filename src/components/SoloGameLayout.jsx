@@ -4,6 +4,7 @@ import WebcamSoloView from './WebcamSoloView'
 import MemoCharacterCard from './MemoCharacterCard'
 import { useGameSession } from '../context/gameSession'
 import { startSoloGame, sendFrame, finishSoloGame } from '../api/soloApi'
+import memoge from '../assets/memoge.svg'
 
 const FRAME_INTERVAL_MS = 350
 const ROUND_TOTAL_SEC = 15
@@ -44,34 +45,41 @@ const ProgressRow = styled.div`
 `
 
 const ExpressionCard = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 18px 32px 20px;
-  border-radius: 4px;
-  background: ${({ $feedback }) =>
-    $feedback === 'matched' ? '#d4edda' :
-    $feedback === 'timeout' ? '#fde0de' :
-    '#FFF176'};
-  box-shadow: 3px 4px 12px rgba(0,0,0,0.18), inset 0 -3px 0 rgba(0,0,0,0.07);
-  transition: background 0.25s ease;
   position: relative;
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 6px;
-    background: rgba(0,0,0,0.08);
-    border-radius: 4px 4px 0 0;
-  }
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(220px, 30vw, 320px);
+  align-self: center;
   ${({ $feedback }) =>
     $feedback &&
     css`animation: ${flash} 0.5s ease;`}
 `
 
+const MemoImg = styled.img`
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: ${({ $feedback }) =>
+    $feedback === 'matched' ? 'hue-rotate(100deg) saturate(0.7)' :
+    $feedback === 'timeout' ? 'hue-rotate(-30deg) saturate(1.2) brightness(1.05)' :
+    'none'};
+  transition: filter 0.25s ease;
+`
+
+const ExpressionOverlay = styled.div`
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding-bottom: 6px;
+`
+
 const ExpressionEmoji = styled.span`
-  font-size: clamp(40px, 7vw, 64px);
+  font-size: clamp(36px, 6vw, 56px);
   line-height: 1;
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
 `
@@ -299,11 +307,14 @@ export default function SoloGameLayout({ onFinish, nickname }) {
         </ProgressRow>
 
         <ExpressionCard $feedback={feedback}>
-          <ExpressionEmoji>{currentExpr?.emoji ?? '🎭'}</ExpressionEmoji>
-          <ExpressionLabel>{currentExpr?.label ?? '표정을 따라해 주세요'}</ExpressionLabel>
-          <ScoreBarWrap>
-            <ScoreBarFill $score={targetScore} />
-          </ScoreBarWrap>
+          <MemoImg src={memoge} alt="" $feedback={feedback} />
+          <ExpressionOverlay>
+            <ExpressionEmoji>{currentExpr?.emoji ?? '🎭'}</ExpressionEmoji>
+            <ExpressionLabel>{currentExpr?.label ?? '표정을 따라해 주세요'}</ExpressionLabel>
+            <ScoreBarWrap>
+              <ScoreBarFill $score={targetScore} />
+            </ScoreBarWrap>
+          </ExpressionOverlay>
         </ExpressionCard>
 
         <CamFrame>
