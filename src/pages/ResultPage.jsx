@@ -306,18 +306,10 @@ export function ResultPage({ mode, nickname, onHome, onRanking, onFilter }) {
   const lifeFourCut = result?.lifeFourCut
 
   const isMulti = mode === 'multi'
-  const player = nickname || 'Player 1'
   const left = result?.score?.left ?? 0
   const right = result?.score?.right ?? 0
 
-  // 멀티: 승패 결과 / 솔로: 결과 텍스트 없음
-  const outcome = isMulti
-    ? left > right
-      ? `${player} WIN`
-      : left < right
-        ? `${player} LOSE`
-        : 'DRAW'
-    : null
+  const outcome = null
   const isWin = isMulti ? left > right : true
 
   const heroValue = isMulti ? `${left} : ${right}` : timeDisplay

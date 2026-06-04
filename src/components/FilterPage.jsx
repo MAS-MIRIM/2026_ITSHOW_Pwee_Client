@@ -306,7 +306,7 @@ function FilterPageInner({ onRetry, onDone, onBack }) {
   const rafRef = useRef(0)
   const landmarkerRef = useRef(null)
   const stickersRef = useRef({})
-  const lastLandmarksRef = useRef(null)
+  const lastLandmarksRef = useRef([])
   const filterRef = useRef('bunny')
   const shotTakenRef = useRef(false)
 
@@ -451,11 +451,13 @@ function FilterPageInner({ onRetry, onDone, onBack }) {
         if (lm) {
           try {
             const result = lm.detectForVideo(video, performance.now())
-            lastLandmarksRef.current = result?.faceLandmarks?.[0] ?? null
+            lastLandmarksRef.current = result?.faceLandmarks ?? []
           } catch {
             /* keep last landmarks */
           }
-          drawStickers(ctx, lastLandmarksRef.current, filterRef.current, stickersRef.current, overlay.width, overlay.height)
+          for (const landmarks of lastLandmarksRef.current) {
+            drawStickers(ctx, landmarks, filterRef.current, stickersRef.current, overlay.width, overlay.height)
+          }
         }
       }
       rafRef.current = requestAnimationFrame(loop)
