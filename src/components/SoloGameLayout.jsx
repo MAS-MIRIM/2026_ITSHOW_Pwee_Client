@@ -46,6 +46,7 @@ const ProgressRow = styled.div`
 const CamFrame = styled.div`
   position: relative;
   width: 100%;
+  margin-top: 36px;
 `
 
 const RoundTimerRow = styled.div`
@@ -244,7 +245,7 @@ export default function SoloGameLayout({ onFinish, nickname }) {
 
         <CamFrame>
           <WebcamSoloView videoRef={videoRef} />
-          <MemoCharacterCard emoji={currentExpr?.emoji ?? '🎭'} label={currentExpr?.label} />
+          <MemoCharacterCard emoji={currentExpr?.emoji ?? '🎭'} />
         </CamFrame>
 
         <RoundTimerRow>
