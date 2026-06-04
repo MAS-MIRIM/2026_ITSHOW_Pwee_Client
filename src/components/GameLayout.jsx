@@ -155,6 +155,21 @@ function captureHalf(video, side) {
   return c.toDataURL('image/jpeg', 0.82)
 }
 
+function captureFullMirrored(video) {
+  const w = video.videoWidth
+  const h = video.videoHeight
+  const c = document.createElement('canvas')
+  c.width = w
+  c.height = h
+  const ctx = c.getContext('2d')
+  ctx.save()
+  ctx.translate(w, 0)
+  ctx.scale(-1, 1)
+  ctx.drawImage(video, 0, 0, w, h)
+  ctx.restore()
+  return c.toDataURL('image/jpeg', 0.82)
+}
+
 /* ── 메인 컴포넌트 ── */
 export default function GameLayout({ onFinish, nickname }) {
   const [phase, setPhase] = useState('connecting')  // connecting | waiting | playing | done | error
@@ -312,18 +327,19 @@ export default function GameLayout({ onFinish, nickname }) {
 
       const frame1 = captureHalf(video, 'right') // P1: 화면 왼쪽 = 비디오 오른쪽
       const frame2 = captureHalf(video, 'left')  // P2: 화면 오른쪽 = 비디오 왼쪽
+      const fullFrame = captureFullMirrored(video)
 
       // 패널티 중인 플레이어는 penalty_frame, 나머지는 submit_frame
       if (penalty && penalty.userId === p1.user_id) {
         socket.emit('penalty_frame', { room_id: roomId, user_id: p1.user_id, image_base64: frame1 })
       } else {
-        socket.emit('submit_frame', { room_id: roomId, user_id: p1.user_id, image_base64: frame1 })
+        socket.emit('submit_frame', { room_id: roomId, user_id: p1.user_id, image_base64: frame1, photo_base64: fullFrame })
       }
 
       if (penalty && penalty.userId === p2.user_id) {
         socket.emit('penalty_frame', { room_id: roomId, user_id: p2.user_id, image_base64: frame2 })
       } else {
-        socket.emit('submit_frame', { room_id: roomId, user_id: p2.user_id, image_base64: frame2 })
+        socket.emit('submit_frame', { room_id: roomId, user_id: p2.user_id, image_base64: frame2, photo_base64: fullFrame })
       }
     }
 
