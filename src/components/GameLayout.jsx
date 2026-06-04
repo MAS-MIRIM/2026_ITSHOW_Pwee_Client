@@ -292,7 +292,7 @@ export default function GameLayout({ onFinish, nickname }) {
         setResult({
           mode: 'multi',
           score: { left: s[p1Id] ?? 0, right: s[p2Id] ?? 0 },
-          lifeFourCut: data.image,
+          lifeFourCut: data.image ? `data:image/jpeg;base64,${data.image}` : null,
         })
         const shots = Array.from({ length: 4 }, (_, i) => {
           const url = data.fail_photo_urls?.[i]

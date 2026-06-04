@@ -226,7 +226,7 @@ export default function SoloGameLayout({ onFinish, nickname }) {
             setResult({
               mode: 'solo',
               timeMs: fin.clear_time_ms,
-              lifeFourCut: fin.life_four_cut,
+              lifeFourCut: fin.life_four_cut ? `data:image/jpeg;base64,${fin.life_four_cut}` : null,
             })
             const shots = Array.from({ length: 4 }, (_, i) => {
               const b64 = fin.fail_shots?.[i]
