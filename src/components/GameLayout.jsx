@@ -138,17 +138,19 @@ function generateRoomId() {
   return 'room-' + Math.random().toString(36).slice(2, 8)
 }
 
-function captureFrame(video) {
+function captureHalf(video, side) {
   const w = video.videoWidth
   const h = video.videoHeight
+  const hw = Math.floor(w / 2)
   const c = document.createElement('canvas')
-  c.width = w
+  c.width = hw
   c.height = h
   const ctx = c.getContext('2d')
   ctx.save()
-  ctx.translate(w, 0)
+  ctx.translate(hw, 0)
   ctx.scale(-1, 1)
-  ctx.drawImage(video, 0, 0, w, h)
+  const sx = side === 'left' ? 0 : hw
+  ctx.drawImage(video, sx, 0, hw, h, 0, 0, hw, h)
   ctx.restore()
   return c.toDataURL('image/jpeg', 0.82)
 }
@@ -308,8 +310,8 @@ export default function GameLayout({ onFinish, nickname }) {
       if (!video || video.readyState < 2 || video.videoWidth === 0) return
       if (!socket?.connected) return
 
-      const frame1 = captureFrame(video)
-      const frame2 = captureFrame(video)
+      const frame1 = captureHalf(video, 'right') // P1: 화면 왼쪽 = 비디오 오른쪽
+      const frame2 = captureHalf(video, 'left')  // P2: 화면 오른쪽 = 비디오 왼쪽
 
       // 패널티 중인 플레이어는 penalty_frame, 나머지는 submit_frame
       if (penalty && penalty.userId === p1.user_id) {
