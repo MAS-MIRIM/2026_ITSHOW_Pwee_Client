@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
-import styled, { css, keyframes } from 'styled-components'
+import styled, { keyframes } from 'styled-components'
 import WebcamSplitView from './WebcamSplitView'
 import MemoCharacterCard from './MemoCharacterCard'
 import ScoreBoard from './ScoreBoard'
 import { useGameSession } from '../context/gameSession'
 import { getOrCreateUser, createSocket } from '../api/multiApi'
-import memoge from '../assets/memoge.svg'
 
 const FRAME_MS = 350
 const BASE_SERVER = 'http://localhost:5001'
@@ -64,53 +63,6 @@ const ExprRow = styled.div`
   gap: 12px;
 `
 
-const flash = keyframes`
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-`
-
-const ExprCard = styled.div`
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: clamp(180px, 24vw, 280px);
-  ${({ $feedback }) => $feedback && css`animation: ${flash} 0.5s ease;`}
-`
-
-const MemoImg = styled.img`
-  display: block;
-  width: 100%;
-  height: auto;
-  filter: ${({ $feedback }) =>
-    $feedback === 'won' ? 'hue-rotate(100deg) saturate(0.7)' :
-    $feedback === 'penalty' ? 'hue-rotate(-30deg) saturate(1.2) brightness(1.05)' :
-    'none'};
-  transition: filter 0.25s ease;
-`
-
-const ExprOverlay = styled.div`
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  padding-bottom: 4px;
-`
-
-const ExprEmoji = styled.span`
-  font-size: clamp(28px, 4vw, 44px);
-  line-height: 1;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
-`
-
-const ExprLabel = styled.span`
-  font-family: 'Suez One', Georgia, serif;
-  font-size: clamp(13px, 1.6vw, 18px);
-  color: #463c3c;
-`
 
 const RoundBadge = styled.span`
   font-family: 'Suez One', Georgia, serif;
@@ -437,18 +389,11 @@ export default function GameLayout({ onFinish, nickname }) {
       <Stage>
         <ExprRow>
           <RoundBadge>{round} / {total}</RoundBadge>
-          <ExprCard $feedback={feedback}>
-            <MemoImg src={memoge} alt="" $feedback={feedback} />
-            <ExprOverlay>
-              <ExprEmoji>{currentExpr?.emoji ?? '🎭'}</ExprEmoji>
-              <ExprLabel>{currentExpr?.label ?? '표정을 따라해 주세요'}</ExprLabel>
-            </ExprOverlay>
-          </ExprCard>
         </ExprRow>
 
         <CamFrame>
           <WebcamSplitView leftVideoRef={leftVideoRef} rightVideoRef={rightVideoRef} />
-          <MemoCharacterCard />
+          <MemoCharacterCard emoji={currentExpr?.emoji ?? '🎭'} label={currentExpr?.label} />
         </CamFrame>
 
         <ScoresRow>

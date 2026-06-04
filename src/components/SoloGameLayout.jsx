@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
-import styled, { css, keyframes } from 'styled-components'
+import styled, { keyframes } from 'styled-components'
 import WebcamSoloView from './WebcamSoloView'
 import MemoCharacterCard from './MemoCharacterCard'
 import { useGameSession } from '../context/gameSession'
 import { startSoloGame, sendFrame, finishSoloGame } from '../api/soloApi'
-import memoge from '../assets/memoge.svg'
 
 const FRAME_INTERVAL_MS = 350
 const ROUND_TOTAL_SEC = 15
@@ -42,69 +41,6 @@ const ProgressRow = styled.div`
   font-size: clamp(13px, 1.5vw, 16px);
   color: #856b6b;
   letter-spacing: 0.08em;
-`
-
-const ExpressionCard = styled.div`
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: clamp(220px, 30vw, 320px);
-  align-self: center;
-  ${({ $feedback }) =>
-    $feedback &&
-    css`animation: ${flash} 0.5s ease;`}
-`
-
-const MemoImg = styled.img`
-  display: block;
-  width: 100%;
-  height: auto;
-  filter: ${({ $feedback }) =>
-    $feedback === 'matched' ? 'hue-rotate(100deg) saturate(0.7)' :
-    $feedback === 'timeout' ? 'hue-rotate(-30deg) saturate(1.2) brightness(1.05)' :
-    'none'};
-  transition: filter 0.25s ease;
-`
-
-const ExpressionOverlay = styled.div`
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding-bottom: 6px;
-`
-
-const ExpressionEmoji = styled.span`
-  font-size: clamp(36px, 6vw, 56px);
-  line-height: 1;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
-`
-
-const ExpressionLabel = styled.span`
-  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
-  font-size: clamp(16px, 2.2vw, 22px);
-  color: #463c3c;
-`
-
-const ScoreBarWrap = styled.div`
-  width: 100%;
-  max-width: 240px;
-  height: 6px;
-  border-radius: 999px;
-  background: rgba(133, 107, 107, 0.18);
-  overflow: hidden;
-`
-
-const ScoreBarFill = styled.div`
-  height: 100%;
-  border-radius: 999px;
-  background: ${({ $score }) => ($score >= 0.8 ? '#2e7d32' : $score >= 0.5 ? '#856b6b' : '#856b6b')};
-  width: ${({ $score }) => Math.round($score * 100)}%;
-  transition: width 0.2s ease;
 `
 
 const CamFrame = styled.div`
@@ -306,20 +242,9 @@ export default function SoloGameLayout({ onFinish, nickname }) {
           라운드&nbsp;{progress.current + 1}&nbsp;/&nbsp;{progress.total}
         </ProgressRow>
 
-        <ExpressionCard $feedback={feedback}>
-          <MemoImg src={memoge} alt="" $feedback={feedback} />
-          <ExpressionOverlay>
-            <ExpressionEmoji>{currentExpr?.emoji ?? '🎭'}</ExpressionEmoji>
-            <ExpressionLabel>{currentExpr?.label ?? '표정을 따라해 주세요'}</ExpressionLabel>
-            <ScoreBarWrap>
-              <ScoreBarFill $score={targetScore} />
-            </ScoreBarWrap>
-          </ExpressionOverlay>
-        </ExpressionCard>
-
         <CamFrame>
           <WebcamSoloView videoRef={videoRef} />
-          <MemoCharacterCard />
+          <MemoCharacterCard emoji={currentExpr?.emoji ?? '🎭'} label={currentExpr?.label} />
         </CamFrame>
 
         <RoundTimerRow>
