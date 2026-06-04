@@ -70,20 +70,31 @@ const flash = keyframes`
 
 const ExprCard = styled.div`
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 12px 22px;
-  border: 2px solid #856b6b;
-  border-radius: 14px;
+  gap: 8px;
+  padding: 16px 28px 18px;
+  border-radius: 4px;
   background: ${({ $feedback }) =>
-    $feedback === 'won' ? '#d4edda' : $feedback === 'penalty' ? '#fde0de' : '#f8e9c8'};
+    $feedback === 'won' ? '#d4edda' : $feedback === 'penalty' ? '#fde0de' : '#FFF176'};
+  box-shadow: 3px 4px 10px rgba(0,0,0,0.18), inset 0 -3px 0 rgba(0,0,0,0.07);
   transition: background 0.25s;
+  position: relative;
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 6px;
+    background: rgba(0,0,0,0.08);
+    border-radius: 4px 4px 0 0;
+  }
   ${({ $feedback }) => $feedback && css`animation: ${flash} 0.5s ease;`}
 `
 
 const ExprEmoji = styled.span`
-  font-size: clamp(28px, 4vw, 42px);
+  font-size: clamp(32px, 5vw, 52px);
   line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
 `
 
 const ExprLabel = styled.span`
@@ -110,51 +121,54 @@ const CamFrame = styled.div`
   width: 100%;
 `
 
-const PenaltyBanner = styled.div`
-  background: #fde0de;
-  border: 2px solid #c44545;
-  border-radius: 12px;
-  padding: 10px 20px;
-  text-align: center;
-  font-family: 'Suez One', Georgia, serif;
-  font-size: clamp(12px, 1.4vw, 15px);
-  color: #c44545;
+const slideInLeft = keyframes`
+  from { transform: translateX(-100%); opacity: 0; }
+  to   { transform: translateX(0);     opacity: 1; }
 `
 
-const flashIn = keyframes`
-  0%   { opacity: 0; transform: scale(0.7); }
-  30%  { opacity: 1; transform: scale(1.08); }
-  60%  { opacity: 1; transform: scale(1); }
-  100% { opacity: 0; transform: scale(1); }
+const slideInRight = keyframes`
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
 `
 
-const PenaltyFlash = styled.div`
+const PenaltyAlert = styled.div`
   position: fixed;
-  inset: 0;
+  top: 50%;
+  transform: translateY(-50%);
   z-index: 999;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 12px;
-  background: rgba(196, 69, 69, 0.18);
+  gap: 10px;
+  padding: 20px 24px;
+  background: #fde0de;
+  border: 2px solid #c44545;
+  border-radius: ${({ $side }) => $side === 'left' ? '0 16px 16px 0' : '16px 0 0 16px'};
+  box-shadow: 4px 4px 16px rgba(196,69,69,0.25);
   pointer-events: none;
-  animation: ${flashIn} 2s ease forwards;
+  max-width: 200px;
+  text-align: center;
+  animation: ${({ $side }) => $side === 'left' ? slideInLeft : slideInRight} 0.35s ease;
+  ${({ $side }) => $side === 'left' ? 'left: 0;' : 'right: 0;'}
 `
 
-const PenaltyFlashTitle = styled.div`
+const PenaltyAlertTitle = styled.div`
   font-family: 'Suez One', Georgia, serif;
-  font-size: clamp(48px, 8vw, 80px);
+  font-size: clamp(13px, 1.5vw, 16px);
   color: #c44545;
   letter-spacing: 0.04em;
-  text-shadow: 0 4px 20px rgba(196,69,69,0.35);
 `
 
-const PenaltyFlashSub = styled.div`
-  font-family: Georgia, serif;
-  font-size: clamp(16px, 2.2vw, 22px);
+const PenaltyAlertEmoji = styled.div`
+  font-size: clamp(28px, 4vw, 40px);
+  line-height: 1;
+`
+
+const PenaltyAlertSub = styled.div`
+  font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+  font-size: clamp(11px, 1.2vw, 13px);
   color: #463c3c;
-  text-align: center;
+  line-height: 1.4;
 `
 
 /* ── 유틸 ── */
@@ -189,8 +203,7 @@ export default function GameLayout({ onFinish, nickname }) {
   const [total, setTotal] = useState(10)
   const [scores, setScores] = useState({})
   const [feedback, setFeedback] = useState(null)
-  const [penalty, setPenalty] = useState(null)       // { userId, expr, name }
-  const [penaltyFlash, setPenaltyFlash] = useState(null) // { name, expr } — 2초간 표시
+  const [penalty, setPenalty] = useState(null)       // { userId, expr, name, emoji, label }
 
   const socketRef = useRef(null)
   const roomIdRef = useRef(null)
@@ -258,8 +271,6 @@ export default function GameLayout({ onFinish, nickname }) {
             name: pa.username,
           }
           setPenalty(info)
-          setPenaltyFlash(info)
-          setTimeout(() => setPenaltyFlash(null), 2000)
         }
 
         if (!data.game_finished && data.next_expression) {
@@ -398,16 +409,21 @@ export default function GameLayout({ onFinish, nickname }) {
   const p1Id = p1Ref.current?.user_id
   const p2Id = p2Ref.current?.user_id
 
+  const penaltySide = penalty
+    ? (penalty.userId === p1Id ? 'left' : 'right')
+    : null
+
   return (
     <Page>
-      {penaltyFlash && (
-        <PenaltyFlash key={penaltyFlash.name + penaltyFlash.expr}>
-          <PenaltyFlashTitle>⚠️ 패널티!</PenaltyFlashTitle>
-          <PenaltyFlashSub>
-            {penaltyFlash.name}님<br />
-            {penaltyFlash.emoji} {penaltyFlash.label} 표정을 지어주세요
-          </PenaltyFlashSub>
-        </PenaltyFlash>
+      {penalty && (
+        <PenaltyAlert key={penalty.userId + penalty.expr} $side={penaltySide}>
+          <PenaltyAlertTitle>⚠️ 패널티!</PenaltyAlertTitle>
+          <PenaltyAlertEmoji>{penalty.emoji}</PenaltyAlertEmoji>
+          <PenaltyAlertSub>
+            {penalty.name}님<br />
+            {penalty.label} 표정을 지어주세요
+          </PenaltyAlertSub>
+        </PenaltyAlert>
       )}
       <Stage>
         <ExprRow>
@@ -417,12 +433,6 @@ export default function GameLayout({ onFinish, nickname }) {
             <ExprLabel>{currentExpr?.label ?? '표정을 따라해 주세요'}</ExprLabel>
           </ExprCard>
         </ExprRow>
-
-        {penalty && (
-          <PenaltyBanner>
-            ⚠️ {penalty.name}님 패널티 중 — {penalty.emoji} {penalty.label} 표정을 지어주세요!
-          </PenaltyBanner>
-        )}
 
         <CamFrame>
           <WebcamSplitView leftVideoRef={leftVideoRef} rightVideoRef={rightVideoRef} />

@@ -47,23 +47,33 @@ const ExpressionCard = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  padding: 16px 24px;
-  border: 2px solid #856b6b;
-  border-radius: 16px;
+  gap: 8px;
+  padding: 18px 32px 20px;
+  border-radius: 4px;
   background: ${({ $feedback }) =>
     $feedback === 'matched' ? '#d4edda' :
     $feedback === 'timeout' ? '#fde0de' :
-    '#f8e9c8'};
+    '#FFF176'};
+  box-shadow: 3px 4px 12px rgba(0,0,0,0.18), inset 0 -3px 0 rgba(0,0,0,0.07);
   transition: background 0.25s ease;
+  position: relative;
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 6px;
+    background: rgba(0,0,0,0.08);
+    border-radius: 4px 4px 0 0;
+  }
   ${({ $feedback }) =>
     $feedback &&
     css`animation: ${flash} 0.5s ease;`}
 `
 
 const ExpressionEmoji = styled.span`
-  font-size: clamp(36px, 6vw, 56px);
+  font-size: clamp(40px, 7vw, 64px);
   line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
 `
 
 const ExpressionLabel = styled.span`
