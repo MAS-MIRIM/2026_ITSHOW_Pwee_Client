@@ -9,19 +9,19 @@ async function request(path, options) {
   return res.json()
 }
 
-export function uploadPhoto(imageBase64) {
+export function uploadPhoto(imageBase64, videoGameId) {
   return request('/api/share/upload', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ image_base64: imageBase64 }),
+    body: JSON.stringify({ image_base64: imageBase64, video_id: videoGameId ?? null }),
   })
 }
 
-export function sendEmail(email, imageId) {
+export function sendEmail(email, imageId, videoGameId) {
   return request('/api/share/email', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, image_id: imageId }),
+    body: JSON.stringify({ email, image_id: imageId, video_id: videoGameId ?? null }),
   })
 }
 

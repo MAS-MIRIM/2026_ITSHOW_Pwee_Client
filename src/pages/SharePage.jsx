@@ -160,7 +160,7 @@ const Btn = styled.button`
 `
 
 export function SharePage({ onRestart }) {
-  const { filterShot, shareImage } = useGameSession()
+  const { filterShot, shareImage, videoGameId } = useGameSession()
   const imageToShare = shareImage ?? filterShot
 
   const [imageId, setImageId]     = useState(null)
@@ -178,7 +178,7 @@ export function SharePage({ onRestart }) {
     if (!imageToShare || uploadedRef.current) return
     uploadedRef.current = true
 
-    uploadPhoto(imageToShare)
+    uploadPhoto(imageToShare, videoGameId)
       .then((res) => {
         setImageId(res.image_id)
         setQrB64(res.qr_b64)
@@ -194,7 +194,7 @@ export function SharePage({ onRestart }) {
     setSending(true)
     setSendStatus(null)
     try {
-      await sendEmail(email.trim(), imageId)
+      await sendEmail(email.trim(), imageId, videoGameId)
       setSendStatus({ ok: true, msg: '메일을 전송했습니다!' })
       setEmail('')
     } catch (err) {
@@ -226,7 +226,7 @@ export function SharePage({ onRestart }) {
                   : <Spinner />
             }
           </QRBox>
-          <QRLabel>QR로 다운로드</QRLabel>
+          <QRLabel>QR로 사진·영상 다운로드</QRLabel>
         </QRSection>
 
         <Divider />
@@ -250,7 +250,7 @@ export function SharePage({ onRestart }) {
               className="primary"
               disabled={sending || !email.trim() || !imageId}
             >
-              {sending ? '전송 중...' : '📧 전송'}
+              {sending ? '전송 중...' : '📧 사진·영상 전송'}
             </Btn>
           </BtnRow>
         </EmailForm>

@@ -8,6 +8,7 @@ export function GameSessionProvider({ children }) {
   const [result, setResultState] = useState(null)
   const [failShots, setFailShotsState] = useState([null, null, null, null])
   const [shareImage, setShareImageState] = useState(null)
+  const [videoGameId, setVideoGameIdState] = useState(null)
 
   const pushCapture = useCallback((dataUrl) => {
     setCaptures((prev) => [...prev, dataUrl])
@@ -54,6 +55,10 @@ export function GameSessionProvider({ children }) {
     setShareImageState(dataUrl)
   }, [])
 
+  const setVideoGameId = useCallback((id) => {
+    setVideoGameIdState(id)
+  }, [])
+
   const ctx = useMemo(
     () => ({
       captures,
@@ -62,6 +67,7 @@ export function GameSessionProvider({ children }) {
       result,
       failShots,
       shareImage,
+      videoGameId,
       pushCapture,
       setResult,
       pickFourCut,
@@ -69,8 +75,9 @@ export function GameSessionProvider({ children }) {
       setFailShots,
       updateFailShot,
       setShareImage,
+      setVideoGameId,
     }),
-    [captures, fourCutShots, filterShot, result, failShots, shareImage, pushCapture, setResult, pickFourCut, setFilterShotCb, setFailShots, updateFailShot, setShareImage],
+    [captures, fourCutShots, filterShot, result, failShots, shareImage, videoGameId, pushCapture, setResult, pickFourCut, setFilterShotCb, setFailShots, updateFailShot, setShareImage, setVideoGameId],
   )
 
   return <GameSessionContext.Provider value={ctx}>{children}</GameSessionContext.Provider>

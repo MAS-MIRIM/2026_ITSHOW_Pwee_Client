@@ -300,7 +300,7 @@ function drawStickers(ctx, landmarks, filter, stickers, w, h) {
 }
 
 function FilterPageInner({ onRetry, onDone, onBack }) {
-  const { setFilterShot } = useGameSession()
+  const { setFilterShot, setVideoGameId } = useGameSession()
   const videoRef = useRef(null)
   const overlayRef = useRef(null)
   const rafRef = useRef(0)
@@ -546,7 +546,7 @@ function FilterPageInner({ onRetry, onDone, onBack }) {
       const gameId = `filter-${Date.now()}`
       setVideoStatus('uploading')
       uploadVideo(gameId, blob)
-        .then(() => setVideoStatus('done'))
+        .then(() => { setVideoStatus('done'); setVideoGameId(gameId) })
         .catch(() => setVideoStatus('error'))
     }
 

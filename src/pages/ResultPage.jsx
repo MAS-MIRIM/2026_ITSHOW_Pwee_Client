@@ -300,7 +300,7 @@ function formatTime(ms) {
 
 /* ── 컴포넌트 ── */
 export function ResultPage({ mode, nickname, onHome, onRanking, onFilter }) {
-  const { result } = useGameSession()
+  const { result, videoGameId } = useGameSession()
 
   const timeDisplay = formatTime(result?.timeMs)
   const lifeFourCut = result?.lifeFourCut
@@ -327,7 +327,7 @@ export function ResultPage({ mode, nickname, onHome, onRanking, onFilter }) {
   useEffect(() => {
     if (!lifeFourCut || uploadedRef.current) return
     uploadedRef.current = true
-    uploadPhoto(lifeFourCut)
+    uploadPhoto(lifeFourCut, videoGameId)
       .then((res) => { setImageId(res.image_id); setQrB64(res.qr_b64) })
       .catch((err) => setUploadErr(err.message))
   }, [lifeFourCut])
@@ -338,7 +338,7 @@ export function ResultPage({ mode, nickname, onHome, onRanking, onFilter }) {
     setSending(true)
     setSendStatus(null)
     try {
-      await sendEmail(email.trim(), imageId)
+      await sendEmail(email.trim(), imageId, videoGameId)
       setSendStatus({ ok: true, msg: '메일을 전송했습니다!' })
       setEmail('')
     } catch (err) {
@@ -384,7 +384,7 @@ export function ResultPage({ mode, nickname, onHome, onRanking, onFilter }) {
                 </QRBox>
                 <QRInfo>
                   <QRLabel>QR 스캔</QRLabel>
-                  <QRSub>카메라로 스캔하면<br />사진을 다운로드해요</QRSub>
+                  <QRSub>카메라로 스캔하면<br />사진·영상을 다운로드해요</QRSub>
                   {uploadErr && <ErrMsg>{uploadErr}</ErrMsg>}
                 </QRInfo>
               </QRRow>
@@ -400,7 +400,7 @@ export function ResultPage({ mode, nickname, onHome, onRanking, onFilter }) {
                 />
                 {sendStatus && <StatusMsg $ok={sendStatus.ok}>{sendStatus.msg}</StatusMsg>}
                 <SendBtn type="submit" disabled={sending || !email.trim() || !imageId}>
-                  {sending ? '전송 중...' : '📧 이메일로 전송'}
+                  {sending ? '전송 중...' : '📧 사진·영상 이메일 전송'}
                 </SendBtn>
               </EmailForm>
 
