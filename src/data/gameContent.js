@@ -49,8 +49,8 @@ export const guideMessages = {
 };
 
 export const rankingData = [
-  { rank: 1, name: "정희진", time: "01:00" },
-  { rank: 2, name: "박홍준", time: "01:10" },
-  { rank: 3, name: "윤건", time: "01:20" },
-  { rank: 4, name: "우지영", time: "01:30" },
+  { rank: 1, name: "정희진", time: "60.00" },
+  { rank: 2, name: "박홍준", time: "70.00" },
+  { rank: 3, name: "윤건", time: "80.00" },
+  { rank: 4, name: "우지영", time: "90.00" },
 ];

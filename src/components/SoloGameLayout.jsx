@@ -2,11 +2,11 @@ import { useEffect, useRef, useState } from 'react'
 import styled, { keyframes } from 'styled-components'
 import WebcamSoloView from './WebcamSoloView'
 import MemoCharacterCard from './MemoCharacterCard'
+import AccuracyProgress from './AccuracyProgress'
 import { useGameSession } from '../context/gameSession'
 import { startSoloGame, sendFrame, finishSoloGame } from '../api/soloApi'
 
 const FRAME_INTERVAL_MS = 350
-const ROUND_TOTAL_SEC = 15
 
 const flash = keyframes`
   0%, 100% { opacity: 1; }
@@ -31,7 +31,7 @@ const Stage = styled.div`
   flex-direction: column;
   align-items: stretch;
   gap: clamp(12px, 1.8vw, 20px);
-  padding-top: clamp(40px, 5vh, 64px);
+  padding-top: clamp(8px, 2vh, 24px);
 `
 
 const ProgressRow = styled.div`
@@ -46,7 +46,7 @@ const ProgressRow = styled.div`
 const CamFrame = styled.div`
   position: relative;
   width: 100%;
-  margin-top: 36px;
+  margin-top: 56px;
 `
 
 const RoundTimerRow = styled.div`
@@ -56,28 +56,23 @@ const RoundTimerRow = styled.div`
   justify-content: center;
 `
 
+const AccuracyWrap = styled.div`
+  width: min(420px, 100%);
+  align-self: center;
+`
+
 const TimerLabel = styled.span`
   font-family: 'Suez One', Georgia, serif;
   font-size: clamp(16px, 2vw, 22px);
-  color: ${({ $warn }) => ($warn ? '#c44545' : '#463c3c')};
+  color: #463c3c;
   font-variant-numeric: tabular-nums;
-  transition: color 0.2s;
 `
 
-const TimerBarWrap = styled.div`
-  width: clamp(120px, 20vw, 200px);
-  height: 6px;
-  border-radius: 999px;
-  background: rgba(133, 107, 107, 0.18);
-  overflow: hidden;
-`
-
-const TimerBarFill = styled.div`
-  height: 100%;
-  border-radius: 999px;
-  background: ${({ $warn }) => ($warn ? '#c44545' : '#463c3c')};
-  width: ${({ $pct }) => $pct}%;
-  transition: width 0.35s linear, background 0.2s;
+const TimerText = styled.span`
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+  font-size: clamp(13px, 1.5vw, 16px);
+  color: #856b6b;
+  font-weight: 800;
 `
 
 const CenteredMessage = styled.div`
@@ -106,6 +101,90 @@ const Spinner = styled.div`
   }
 `
 
+const GameOverOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: clamp(20px, 5vw, 48px);
+  background: rgba(31, 26, 26, 0.72);
+  backdrop-filter: blur(3px);
+  pointer-events: auto;
+`
+
+const GameOverPanel = styled.div`
+  width: min(100%, 560px);
+  height: min(78vh, 720px);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  justify-items: center;
+  padding: clamp(16px, 4vw, 32px);
+  text-align: center;
+`
+
+const GameOverTitle = styled.h1`
+  margin: 0;
+  font-family: 'Suez One', Georgia, serif;
+  font-size: clamp(48px, 9vw, 96px);
+  line-height: 0.95;
+  color: #fffdf2;
+  letter-spacing: 0;
+  white-space: nowrap;
+  text-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+`
+
+const RecordBox = styled.div`
+  width: min(100%, 420px);
+  align-self: center;
+  padding: 8px 0;
+  display: grid;
+  place-items: center;
+  gap: 6px;
+`
+
+const RecordLabel = styled.span`
+  color: rgba(255, 253, 242, 0.78);
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+`
+
+const RecordValue = styled.strong`
+  color: #fffdf2;
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+  font-weight: 900;
+  font-size: clamp(42px, 8vw, 68px);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 6px 22px rgba(0, 0, 0, 0.42);
+`
+
+const NextButton = styled.button`
+  width: min(100%, 320px);
+  min-height: 56px;
+  align-self: end;
+  border-radius: 999px;
+  border: none;
+  background: #463c3c;
+  color: #fffdf2;
+  box-shadow: 0 6px 0 #241f1f, 0 12px 22px rgba(70, 60, 60, 0.18);
+  cursor: pointer;
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+  font-size: clamp(16px, 1.8vw, 18px);
+  font-weight: 900;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.15s ease;
+
+  &:hover { filter: brightness(1.03); }
+  &:active { transform: translateY(3px); box-shadow: 0 3px 0 #241f1f; }
+  &:focus-visible { outline: 3px solid rgba(255, 253, 242, 0.82); outline-offset: 4px; }
+`
+
+function formatTime(ms) {
+  if (!ms) return '0.00s'
+  return `${(ms / 1000).toFixed(2)}s`
+}
+
 export default function SoloGameLayout({ onFinish, nickname }) {
   const videoRef = useRef(null)
   const canvasRef = useRef(null)
@@ -117,9 +196,11 @@ export default function SoloGameLayout({ onFinish, nickname }) {
   const [errorMsg, setErrorMsg] = useState(null)
   const [currentExpr, setCurrentExpr] = useState(null)
   const [progress, setProgress] = useState({ current: 0, total: 10 })
-  const [roundTime, setRoundTime] = useState(ROUND_TOTAL_SEC)
   const [targetScore, setTargetScore] = useState(0)
   const [feedback, setFeedback] = useState(null)
+  const [gameOver, setGameOver] = useState(false)
+  const [finalTimeMs, setFinalTimeMs] = useState(0)
+  const [elapsedMs, setElapsedMs] = useState(0)
 
   const { setResult, setFailShots } = useGameSession()
 
@@ -170,7 +251,6 @@ export default function SoloGameLayout({ onFinish, nickname }) {
       try {
         const res = await sendFrame(gameIdRef.current, dataUrl)
 
-        setRoundTime(res.round_time_remaining ?? ROUND_TOTAL_SEC)
         setTargetScore(res.target_score ?? 0)
         setProgress((prev) => ({ ...prev, current: res.current_index ?? prev.current }))
 
@@ -178,9 +258,11 @@ export default function SoloGameLayout({ onFinish, nickname }) {
           finishedRef.current = true
           try {
             const fin = await finishSoloGame(gameIdRef.current, nickname ?? '익명')
+            const finishedTime = fin.clear_time_ms ?? elapsedMs
+            setFinalTimeMs(finishedTime)
             setResult({
               mode: 'solo',
-              timeMs: fin.clear_time_ms,
+              timeMs: finishedTime,
               lifeFourCut: fin.life_four_cut ? `data:image/jpeg;base64,${fin.life_four_cut}` : null,
             })
             const shots = Array.from({ length: 4 }, (_, i) => {
@@ -189,9 +271,11 @@ export default function SoloGameLayout({ onFinish, nickname }) {
             })
             setFailShots(shots)
           } catch {
-            setResult({ mode: 'solo', timeMs: res.clear_time_ms ?? 0 })
+            const fallbackTime = res.clear_time_ms ?? elapsedMs
+            setFinalTimeMs(fallbackTime)
+            setResult({ mode: 'solo', timeMs: fallbackTime })
           }
-          onFinish()
+          setGameOver(true)
           return
         }
 
@@ -199,7 +283,6 @@ export default function SoloGameLayout({ onFinish, nickname }) {
           const nextFeedback = res.matched ? 'matched' : 'timeout'
           setFeedback(nextFeedback)
           setCurrentExpr(res.next_expression)
-          setRoundTime(ROUND_TOTAL_SEC)
           setTargetScore(0)
           setTimeout(() => setFeedback(null), 500)
         }
@@ -213,6 +296,15 @@ export default function SoloGameLayout({ onFinish, nickname }) {
     const id = setInterval(tick, FRAME_INTERVAL_MS)
     return () => clearInterval(id)
   }, [loading, errorMsg, nickname, onFinish, setResult, setFailShots])
+
+  useEffect(() => {
+    if (loading || errorMsg || gameOver) return
+    const startedAt = performance.now() - elapsedMs
+    const id = setInterval(() => {
+      setElapsedMs(performance.now() - startedAt)
+    }, 100)
+    return () => clearInterval(id)
+  }, [loading, errorMsg, gameOver]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (errorMsg) {
     return (
@@ -233,9 +325,6 @@ export default function SoloGameLayout({ onFinish, nickname }) {
     )
   }
 
-  const timePct = Math.round((roundTime / ROUND_TOTAL_SEC) * 100)
-  const timeWarn = roundTime <= 5
-
   return (
     <Page>
       <Stage>
@@ -245,16 +334,32 @@ export default function SoloGameLayout({ onFinish, nickname }) {
 
         <CamFrame>
           <WebcamSoloView videoRef={videoRef} />
-          <MemoCharacterCard emoji={currentExpr?.emoji ?? '🎭'} />
+          <MemoCharacterCard expression={currentExpr} emoji="🎭" />
         </CamFrame>
 
+        <AccuracyWrap>
+          <AccuracyProgress value={targetScore} />
+        </AccuracyWrap>
+
         <RoundTimerRow>
-          <TimerBarWrap>
-            <TimerBarFill $pct={timePct} $warn={timeWarn} />
-          </TimerBarWrap>
-          <TimerLabel $warn={timeWarn}>{roundTime.toFixed(1)}s</TimerLabel>
+          <TimerText>총 플레이 시간</TimerText>
+          <TimerLabel>{formatTime(elapsedMs)}</TimerLabel>
         </RoundTimerRow>
       </Stage>
+      {gameOver && (
+        <GameOverOverlay>
+          <GameOverPanel role="dialog" aria-modal="true" aria-labelledby="time-over-title">
+            <GameOverTitle id="time-over-title">TIME OVER</GameOverTitle>
+            <RecordBox>
+              <RecordLabel>최종 플레이 시간</RecordLabel>
+              <RecordValue>{formatTime(finalTimeMs)}</RecordValue>
+            </RecordBox>
+            <NextButton type="button" onClick={onFinish}>
+              다음으로
+            </NextButton>
+          </GameOverPanel>
+        </GameOverOverlay>
+      )}
     </Page>
   )
 }
