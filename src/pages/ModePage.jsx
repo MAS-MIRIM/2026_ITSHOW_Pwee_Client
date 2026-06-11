@@ -1,12 +1,13 @@
 import styled from "styled-components";
 
 const Section = styled.section`
-  width: 100vw;
-  min-height: 100vh;
+  position: fixed;
+  inset: 0;
   padding: 36px;
   display: grid;
   background: #fffdf2;
-  margin-left: calc(18% - 25vw);
+  box-sizing: border-box;
+  overflow: hidden;
 `;
 
 const Frame = styled.section`

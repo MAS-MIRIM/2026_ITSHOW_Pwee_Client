@@ -1,5 +1,40 @@
 import styled from 'styled-components'
 import memoge from '../assets/memoge.svg'
+import angryIcon from '../assets/expressions/angry.svg'
+import eyebrowsUpIcon from '../assets/expressions/eyebrows_up.svg'
+import happyIcon from '../assets/expressions/happy.svg'
+import kissIcon from '../assets/expressions/kiss.svg'
+import mouthOpenIcon from '../assets/expressions/mouth_open.svg'
+import sadIcon from '../assets/expressions/sad.svg'
+import squintIcon from '../assets/expressions/squint.svg'
+import surprisedIcon from '../assets/expressions/surprised.svg'
+import winkLeftIcon from '../assets/expressions/wink_left.svg'
+import winkRightIcon from '../assets/expressions/wink_right.svg'
+
+const expressionIconsByKey = {
+  angry: angryIcon,
+  eyebrows_up: eyebrowsUpIcon,
+  happy: happyIcon,
+  kiss: kissIcon,
+  mouth_open: mouthOpenIcon,
+  sad: sadIcon,
+  squint: squintIcon,
+  surprised: surprisedIcon,
+  wink_left: winkRightIcon,
+  wink_right: winkLeftIcon,
+}
+
+const expressionIconsByEmoji = {
+  '😡': angryIcon,
+  '🙆': eyebrowsUpIcon,
+  '😄': happyIcon,
+  '😘': kissIcon,
+  '😮': mouthOpenIcon,
+  '😢': sadIcon,
+  '😑': squintIcon,
+  '😲': surprisedIcon,
+  '😉': winkLeftIcon,
+}
 
 const Wrap = styled.div`
   position: absolute;
@@ -33,13 +68,32 @@ const Emoji = styled.span`
   filter: drop-shadow(0 2px 6px rgba(0,0,0,0.15));
 `
 
-export default function MemoCharacterCard({ emoji }) {
+const ExpressionIcon = styled.img`
+  display: block;
+  width: clamp(64px, 9vw, 96px);
+  height: clamp(64px, 9vw, 96px);
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.15));
+`
+
+function getExpressionIcon(expression, emoji) {
+  return expressionIconsByKey[expression?.key] ?? expressionIconsByEmoji[expression?.emoji ?? emoji]
+}
+
+export default function MemoCharacterCard({ emoji, expression }) {
+  const iconSrc = getExpressionIcon(expression, emoji)
+  const fallbackEmoji = expression?.emoji ?? emoji
+
   return (
     <Wrap>
       <Img src={memoge} alt="" />
-      {emoji && (
+      {(iconSrc || fallbackEmoji) && (
         <Overlay>
-          <Emoji>{emoji}</Emoji>
+          {iconSrc ? (
+            <ExpressionIcon src={iconSrc} alt={expression?.label ?? ''} />
+          ) : (
+            <Emoji>{fallbackEmoji}</Emoji>
+          )}
         </Overlay>
       )}
     </Wrap>

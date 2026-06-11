@@ -7,7 +7,7 @@ const Panel = styled.div`
   background: #fffef8;
   border: 2px solid #856b6b;
   border-radius: 18px 18px 0 0;
-  width: min(1200px, 100%);
+  width: min(1360px, 100%);
   max-height: min(90vh, 840px);
   padding: clamp(36px, 4.5vw, 72px);
   padding-top: clamp(28px, 4vw, 80px);

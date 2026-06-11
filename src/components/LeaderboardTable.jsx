@@ -10,12 +10,12 @@ const Wrap = styled.div`
 
 const Header = styled.div`
   display: grid;
-  grid-template-columns: clamp(64px, 7vw, 96px) auto 1fr;
+  grid-template-columns: clamp(64px, 7vw, 96px) minmax(0, 1fr) clamp(92px, 12vw, 150px);
   column-gap: clamp(8px, 1vw, 14px);
   align-items: center;
   padding: clamp(16px, 2vw, 26px) clamp(8px, 1vw, 14px);
   border-bottom: 1px solid #E5DFD3;
-  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+  font-family: 'Suez One', Georgia, serif;
   font-size: clamp(20px, 2.6vw, 28px);
   font-weight: 700;
   color: #463C3C;
@@ -24,6 +24,9 @@ const Header = styled.div`
 
 const HeaderCell = styled.span`
   display: block;
+  &:first-child {
+    text-align: center;
+  }
   &.time {
     text-align: right;
   }

@@ -10,7 +10,6 @@ import { EntryPage } from './pages/EntryPage'
 import { GuidePage } from './pages/GuidePage'
 import { ModePage } from './pages/ModePage'
 import { NamePage } from './pages/NamePage'
-import { ResultPage } from './pages/ResultPage'
 import { SharePage } from './pages/SharePage'
 import { GameSessionProvider } from './context/GameSessionProvider'
 
@@ -37,14 +36,19 @@ const GlobalStyle = createGlobalStyle`
   html,
   body,
   #root {
-    min-height: 100%;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
   }
 
   body {
     margin: 0;
     min-width: 320px;
-    min-height: 100vh;
+    width: 100vw;
+    height: 100vh;
     background: #fffdf2;
+    overflow: hidden;
+    overscroll-behavior: none;
   }
 
   button,
@@ -66,14 +70,18 @@ const GlobalStyle = createGlobalStyle`
 
 const AppShell = styled.main`
   width: min(100%, 960px);
+  height: 100vh;
   margin: 0 auto;
   padding: 0;
+  overflow: hidden;
 `
 
 const PageFrame = styled.section`
-  min-height: calc(100vh - 64px);
+  width: 100%;
+  height: 100vh;
   display: grid;
   place-items: center;
+  overflow: hidden;
 `
 
 function App() {
@@ -114,10 +122,6 @@ function App() {
       return
     }
     setPage('game')
-  }
-
-  const finishGame = () => {
-    setPage('result')
   }
 
   const goToFourCut = () => {
@@ -169,28 +173,24 @@ function App() {
           )}
 
           {page === 'game' && mode === 'multi' && (
-            <GameLayout onFinish={finishGame} nickname={nickname} />
+            <GameLayout onFinish={goToFourCut} nickname={nickname} />
           )}
 
           {page === 'game' && mode !== 'multi' && (
-            <SoloGameLayout onFinish={finishGame} nickname={nickname} />
+            <SoloGameLayout onFinish={goToFourCut} nickname={nickname} />
           )}
 
-          {page === 'result' && (
-            <ResultPage
-              mode={mode || 'solo'}
-              nickname={nickname}
-              onHome={goHome}
-              onRanking={openRankingPage}
-              onFilter={goToFilter}
+          {page === 'fourcut' && (
+            <FourCutPage
+              onNext={goToFilter}
             />
           )}
 
-          {page === 'fourcut' && <FourCutPage onFilter={goToFilter} onBack={() => setPage('result')} />}
+          {page === 'filter' && <FilterPage onDone={goToShare} />}
 
-          {page === 'filter' && <FilterPage onDone={goToShare} onBack={() => setPage('result')} />}
-
-          {page === 'share' && <SharePage onRestart={goHome} />}
+          {page === 'share' && (
+            <SharePage onRanking={openRankingPage} onRestart={goHome} />
+          )}
         </PageFrame>
       </AppShell>
     </GameSessionProvider>

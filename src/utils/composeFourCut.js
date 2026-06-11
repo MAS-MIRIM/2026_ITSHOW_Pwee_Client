@@ -1,6 +1,6 @@
 import frameSrc from '../assets/frame.png'
 
-const SOURCE_FRAME_W = 1872
+const SOURCE_FRAME_W = 1906
 const SOURCE_FRAME_H = 5473
 const OUTPUT_W = 720
 const SCALE = OUTPUT_W / SOURCE_FRAME_W
