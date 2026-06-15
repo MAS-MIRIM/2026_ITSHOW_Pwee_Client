@@ -650,15 +650,6 @@ function FilterPageInner({ onRetry, onDone }) {
       cancelAnimationFrame(animId);
       const blob = new Blob(chunks, { type: mimeType });
 
-      // local download
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "pwee-video.webm";
-      a.click();
-      URL.revokeObjectURL(url);
-
-      // server upload
       const gameId = `filter-${Date.now()}`;
       setVideoStatus("uploading");
       uploadVideo(gameId, blob)

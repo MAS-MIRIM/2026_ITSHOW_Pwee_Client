@@ -11,7 +11,7 @@ async function tryCreate(fileset, delegate) {
   return FaceLandmarker.createFromOptions(fileset, {
     baseOptions: { modelAssetPath: MODEL_URL, delegate },
     runningMode: 'VIDEO',
-    numFaces: 1,
+    numFaces: 4,
     outputFaceBlendshapes: false,
     outputFacialTransformationMatrixes: false,
   })
