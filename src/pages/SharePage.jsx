@@ -441,6 +441,46 @@ const Page = styled.div`
       );
   }
 `;
+const TopBar = styled.div`
+  position: relative;
+  z-index: 10;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 32px 0;
+`;
+const NavBtn = styled.button`
+  font-family: ${UI};
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 8px 18px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition:
+    transform 0.1s,
+    opacity 0.1s;
+  &:active {
+    transform: translateY(1px);
+    opacity: 0.8;
+  }
+`;
+const HomeNavBtn = styled(NavBtn)`
+  background: transparent;
+  color: ${C.ink};
+  border: 1.5px solid rgba(58, 46, 36, 0.25);
+  &:hover {
+    border-color: ${C.ink};
+  }
+`;
+const RankNavBtn = styled(NavBtn)`
+  background: ${C.coral};
+  color: #fff;
+  border: none;
+  &:hover {
+    opacity: 0.88;
+  }
+`;
 const Body = styled.div`
   flex: 1;
   position: relative;
@@ -470,18 +510,20 @@ const StripRow = styled.div`
 `;
 const GuideHint = styled.img`
   position: fixed;
-  bottom: 24px;
-  left: 48px;
-  width: clamp(180px, 22vw, 280px);
+  bottom: 20px;
+  left: 20px;
+  width: clamp(240px, 26vw, 340px);
   z-index: 50;
   pointer-events: none;
-  opacity: 0.88;
+  opacity: 0.92;
 `;
 
 /* ── Receipt card ────────────────────────────────────────────── */
 const ReceiptOuter = styled.div`
   filter: drop-shadow(0 20px 34px rgba(58, 46, 36, 0.22));
   justify-self: center;
+  transform: rotate(2.5deg);
+  transform-origin: center top;
 `;
 const Receipt = styled.div`
   width: 372px;
@@ -828,7 +870,11 @@ function ScreenDone({ email, onHome }) {
 
 /* ── usePhotoUpload hook ─────────────────────────────────────── */
 function usePhotoUpload(imageSource, videoGameId, uploadKey) {
-  const [uploadState, setUploadState] = useState({ imageId: null, qrB64: null, err: null });
+  const [uploadState, setUploadState] = useState({
+    imageId: null,
+    qrB64: null,
+    err: null,
+  });
 
   useEffect(() => {
     if (!imageSource) return;
@@ -842,14 +888,19 @@ function usePhotoUpload(imageSource, videoGameId, uploadKey) {
       setUploadState({ imageId: res.image_id, qrB64: res.qr_b64, err: null });
     };
     run().catch((e) => {
-      if (!cancelled) setUploadState({ imageId: null, qrB64: null, err: e.message });
+      if (!cancelled)
+        setUploadState({ imageId: null, qrB64: null, err: e.message });
     });
     return () => {
       cancelled = true;
     };
   }, [imageSource, videoGameId, uploadKey]);
 
-  return { imageId: uploadState.imageId, qrB64: uploadState.qrB64, err: uploadState.err };
+  return {
+    imageId: uploadState.imageId,
+    qrB64: uploadState.qrB64,
+    err: uploadState.err,
+  };
 }
 
 /* ── Main ────────────────────────────────────────────────────── */
@@ -859,7 +910,7 @@ function fmtDuration(secs) {
   return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 
-export function SharePage({ onRestart, gameDuration }) {
+export function SharePage({ onRestart, onRanking, gameDuration }) {
   const {
     filterShot,
     shareImage,
@@ -935,7 +986,8 @@ export function SharePage({ onRestart, gameDuration }) {
   /* receipt counter */
   const [receiptNo] = useState(() => {
     try {
-      const n = (parseInt(localStorage.getItem("pwee_receipt_no") ?? "0", 10) || 0) + 1;
+      const n =
+        (parseInt(localStorage.getItem("pwee_receipt_no") ?? "0", 10) || 0) + 1;
       localStorage.setItem("pwee_receipt_no", String(n));
       return n;
     } catch {
@@ -1034,8 +1086,11 @@ export function SharePage({ onRestart, gameDuration }) {
           onCancel={() => setRetakeIndex(null)}
         />
       )}
-      <GuideHint src={guideImg} alt="사용 안내" />
-
+      <GuideHint src={guideImg} alt="사용 안내" />{" "}
+      <TopBar>
+        <HomeNavBtn onClick={onRestart}>← 홈으로</HomeNavBtn>
+        <RankNavBtn onClick={onRanking}>랭킹 보기 →</RankNavBtn>
+      </TopBar>
       <Body>
         {/* ── Left: strips ── */}
         <HeroCol>
@@ -1049,8 +1104,8 @@ export function SharePage({ onRestart, gameDuration }) {
             >
               <PweeStrip
                 shots={slots}
-                cellH={110}
-                width={186}
+                cellH={128}
+                width={216}
                 onRetake={setRetakeIndex}
                 label="GAME"
               />
@@ -1065,8 +1120,8 @@ export function SharePage({ onRestart, gameDuration }) {
               >
                 <PweeStrip
                   shots={fourCutShots}
-                  cellH={110}
-                  width={186}
+                  cellH={128}
+                  width={216}
                   label="vwee"
                 />
               </div>
