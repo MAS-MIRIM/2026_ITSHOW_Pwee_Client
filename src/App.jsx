@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import styled, { createGlobalStyle } from 'styled-components'
 import { guideMessages, modeContent, rankingData } from './data/gameContent'
 import GameLayout from './components/GameLayout'
@@ -89,6 +89,8 @@ function App() {
   const [mode, setMode] = useState('')
   const [page, setPage] = useState('home')
   const [guideStep, setGuideStep] = useState(0)
+  const [gameDuration, setGameDuration] = useState(null)
+  const gameStartRef = useRef(null)
 
   const currentGuideMessages = useMemo(
     () => guideMessages[mode] ?? guideMessages.solo,
@@ -121,15 +123,16 @@ function App() {
       setGuideStep((prev) => prev + 1)
       return
     }
+    gameStartRef.current = Date.now()
     setPage('game')
   }
 
   const goToFourCut = () => {
+    if (gameStartRef.current) {
+      setGameDuration(Math.round((Date.now() - gameStartRef.current) / 1000))
+      gameStartRef.current = null
+    }
     setPage('fourcut')
-  }
-
-  const goToFilter = () => {
-    setPage('filter')
   }
 
   const goToShare = () => {
@@ -140,6 +143,8 @@ function App() {
     setNickname('')
     setMode('')
     setGuideStep(0)
+    setGameDuration(null)
+    gameStartRef.current = null
     setPage('home')
   }
 
@@ -181,15 +186,13 @@ function App() {
           )}
 
           {page === 'fourcut' && (
-            <FourCutPage
-              onNext={goToFilter}
-            />
+            <FourCutPage onNext={goToShare} />
           )}
 
           {page === 'filter' && <FilterPage onDone={goToShare} />}
 
           {page === 'share' && (
-            <SharePage onRanking={openRankingPage} onRestart={goHome} />
+            <SharePage onRanking={openRankingPage} onRestart={goHome} gameDuration={gameDuration} />
           )}
         </PageFrame>
       </AppShell>

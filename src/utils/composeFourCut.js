@@ -92,7 +92,7 @@ export async function composeFourCut(shots) {
   ctx.font = 'bold 76px Georgia, serif'
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
-  ctx.fillText('PWEE', FRAME_W / 2, brandY)
+  ctx.fillText('VWEE', FRAME_W / 2, brandY)
 
   ctx.font = '31px Georgia, serif'
   ctx.fillText(stamp, FRAME_W / 2, brandY + 72)

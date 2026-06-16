@@ -51,6 +51,14 @@ export function GameSessionProvider({ children }) {
     })
   }, [])
 
+  const updateFourCutShot = useCallback((index, dataUrl) => {
+    setFourCutShots((prev) => {
+      const next = [...prev]
+      next[index] = dataUrl
+      return next
+    })
+  }, [])
+
   const setShareImage = useCallback((dataUrl) => {
     setShareImageState(dataUrl)
   }, [])
@@ -74,10 +82,11 @@ export function GameSessionProvider({ children }) {
       setFilterShot: setFilterShotCb,
       setFailShots,
       updateFailShot,
+      updateFourCutShot,
       setShareImage,
       setVideoGameId,
     }),
-    [captures, fourCutShots, filterShot, result, failShots, shareImage, videoGameId, pushCapture, setResult, pickFourCut, setFilterShotCb, setFailShots, updateFailShot, setShareImage, setVideoGameId],
+    [captures, fourCutShots, filterShot, result, failShots, shareImage, videoGameId, pushCapture, setResult, pickFourCut, setFilterShotCb, setFailShots, updateFailShot, updateFourCutShot, setShareImage, setVideoGameId],
   )
 
   return <GameSessionContext.Provider value={ctx}>{children}</GameSessionContext.Provider>
